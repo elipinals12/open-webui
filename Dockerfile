@@ -31,7 +31,8 @@ RUN npm ci
 
 COPY . .
 ENV APP_BUILD_HASH=${BUILD_HASH}
-RUN npm run build
+# changing to one thread so my duct-taped laptop doesn't crash due to insufficient memory!
+RUN npm run build -- --max-workers=1
 
 ######## WebUI backend ########
 FROM python:3.11-slim-bookworm AS base
