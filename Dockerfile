@@ -31,8 +31,10 @@ RUN npm ci
 
 COPY . .
 ENV APP_BUILD_HASH=${BUILD_HASH}
-# changing to one thread so my duct-taped laptop doesn't crash due to insufficient memory!
-RUN npm run build -- --max-workers=1
+# duct-taped laptop has limited mem!
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+RUN npm cache clean --force && rm -rf node_modules package-lock.json && npm install
+RUN npm run build
 
 ######## WebUI backend ########
 FROM python:3.11-slim-bookworm AS base
