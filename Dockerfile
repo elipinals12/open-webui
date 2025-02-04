@@ -31,13 +31,7 @@ RUN npm ci
 
 COPY . .
 ENV APP_BUILD_HASH=${BUILD_HASH}
-
-# duct-taped laptop has limited mem!
-# RUN npm run build
-ENV NODE_OPTIONS="--max-old-space-size=512"
-RUN npm cache clean --force && rm -rf node_modules package-lock.json && npm install --omit=dev
-RUN node --expose-gc -e 'global.gc()'
-RUN npm run build --no-cache --no-minify
+RUN npm run build
 
 ######## WebUI backend ########
 FROM python:3.11-slim-bookworm AS base
