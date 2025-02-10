@@ -15,8 +15,6 @@
 	let LIKE_REASONS = [
 		'accurate_information',
 		'followed_instructions_perfectly',
-		'showcased_creativity',
-		'positive_attitude',
 		'attention_to_detail',
 		'thorough_explanation',
 		'other'
