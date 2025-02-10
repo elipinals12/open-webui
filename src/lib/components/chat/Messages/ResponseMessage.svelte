@@ -792,7 +792,7 @@
 
 							{#if message.done}
 								{#if !readOnly}
-
+								<!-- removed response edit capability cause why -->
 								<Tooltip content={$i18n.t('Copy')} placement="bottom">
 									<button
 										class="{isLastMessage
