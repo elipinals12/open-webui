@@ -478,9 +478,7 @@
 		await tick();
 	});
 
-	let sourcesPresent = Object.values(history.messages).some(
-    	(msg) => msg.content && msg.content.includes('### Sources')
-	);
+	let sourcesPresent = false; // sources toggle to hide Get Sources button after use
 </script>
 
 {#key message.id}
@@ -1217,38 +1215,37 @@
 
 									{#if isLastMessage}
 										{#each model?.actions ?? [] as action}
-											{#if !(action.name === "Get Sources" && sourcesPresent)}
-												<!-- No Tooltip for "Get Sources" -->
-												<button
-													type="button"
-													class="{isLastMessage ? 'visible' : 'invisible group-hover:visible'} flex items-center gap-2 p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition"
-													on:click={() => {
-														actionMessage(action.id, message);
-													}}
-												>
-													{#if action.icon_url}
-														<div class="w-4 h-4">
-															<img
-																src={action.icon_url}
-																class="w-4 h-4 {action.icon_url.includes('svg') ? 'dark:invert-[80%]' : ''}"
-																style="fill: currentColor;"
-																alt={action.name}
-															/>
-														</div>
-													{:else}
-														<Sparkles strokeWidth="2.1" className="size-4" />
-													{/if}
-													<span>Get Sources</span>
-												</button>
+											{#if action.name === "Get Sources"}
+												{#if !sourcesPresent}
+													<button
+														type="button"
+														class="{isLastMessage ? 'visible' : 'invisible group-hover:visible'} flex items-center gap-2 p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition"
+														on:click={() => {
+															actionMessage(action.id, message);
+															sourcesPresent = true;  // Hide the button after it's clicked
+														}}
+													>
+														{#if action.icon_url}
+															<div class="w-4 h-4">
+																<img
+																	src={action.icon_url}
+																	class="w-4 h-4 {action.icon_url.includes('svg') ? 'dark:invert-[80%]' : ''}"
+																	style="fill: currentColor;"
+																	alt={action.name}
+																/>
+															</div>
+														{:else}
+															<Sparkles strokeWidth="2.1" className="size-4" />
+														{/if}
+														<span>Get Sources</span>
+													</button>
+												{/if}
 											{:else}
-												<!-- Tooltip for all other actions -->
 												<Tooltip content={action.name} placement="bottom">
 													<button
 														type="button"
 														class="{isLastMessage ? 'visible' : 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition"
-														on:click={() => {
-															actionMessage(action.id, message);
-														}}
+														on:click={() => actionMessage(action.id, message)}
 													>
 														{#if action.icon_url}
 															<div class="size-4">
@@ -1265,7 +1262,7 @@
 													</button>
 												</Tooltip>
 											{/if}
-										{/each}																
+										{/each}																								
 									{/if}
 								{/if}
 							{/if}
