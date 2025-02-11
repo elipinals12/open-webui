@@ -101,8 +101,6 @@
 	$: if (history.messages) {
 		if (JSON.stringify(message) !== JSON.stringify(history.messages[messageId])) {
 			message = JSON.parse(JSON.stringify(history.messages[messageId]));
-
-			sourcesPresent = false; // Reset the "Get Sources" button for each new message
 		}
 	}
 
@@ -142,8 +140,6 @@
 	let generatingImage = false;
 
 	let showRateComment = false;
-
-	let sourcesPresent = false; // sources toggle to hide Get Sources button after use
 
 	const copyToClipboard = async (text) => {
 		const res = await _copyToClipboard(text);
@@ -1218,14 +1214,12 @@
 									{#if isLastMessage}
 										{#each model?.actions ?? [] as action}
 											{#if action.name === "Get Sources"}
-												{#if !sourcesPresent}
+												<!-- hide the button if it was already used -->
+												{#if !message.content.includes('### Sources')}
 													<button
 														type="button"
 														class="{isLastMessage ? 'visible' : 'invisible group-hover:visible'} flex items-center gap-2 p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition"
-														on:click={() => {
-															actionMessage(action.id, message);
-															sourcesPresent = true;  // Hide the button after it's clicked
-														}}
+														on:click={() => actionMessage(action.id, message)}
 													>
 														{#if action.icon_url}
 															<div class="w-4 h-4">
