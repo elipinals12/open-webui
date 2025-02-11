@@ -1213,12 +1213,33 @@
 
 									{#if isLastMessage}
 										{#each model?.actions ?? [] as action}
-											<Tooltip content={action.name} placement="bottom">
+										<Tooltip content={action.name} placement="bottom">
+											{#if action.name === "Get Sources"}
 												<button
 													type="button"
-													class="{isLastMessage
-														? 'visible'
-														: 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition"
+													class="{isLastMessage ? 'visible' : 'invisible group-hover:visible'} flex items-center gap-2 p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition"
+													on:click={() => {
+														actionMessage(action.id, message);
+													}}
+												>
+													{#if action.icon_url}
+														<div class="w-4 h-4">
+															<img
+																src={action.icon_url}
+																class="w-4 h-4 {action.icon_url.includes('svg') ? 'dark:invert-[80%]' : ''}"
+																style="fill: currentColor;"
+																alt={action.name}
+															/>
+														</div>
+													{:else}
+														<Sparkles strokeWidth="2.1" className="size-4" />
+													{/if}
+													<span>Get Sources</span>
+												</button>
+											{:else}
+												<button
+													type="button"
+													class="{isLastMessage ? 'visible' : 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition"
 													on:click={() => {
 														actionMessage(action.id, message);
 													}}
@@ -1227,9 +1248,7 @@
 														<div class="size-4">
 															<img
 																src={action.icon_url}
-																class="w-4 h-4 {action.icon_url.includes('svg')
-																	? 'dark:invert-[80%]'
-																	: ''}"
+																class="w-4 h-4 {action.icon_url.includes('svg') ? 'dark:invert-[80%]' : ''}"
 																style="fill: currentColor;"
 																alt={action.name}
 															/>
@@ -1238,8 +1257,9 @@
 														<Sparkles strokeWidth="2.1" className="size-4" />
 													{/if}
 												</button>
-											</Tooltip>
-										{/each}
+											{/if}
+										</Tooltip>
+										{/each}								
 									{/if}
 								{/if}
 							{/if}
