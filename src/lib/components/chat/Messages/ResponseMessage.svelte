@@ -101,6 +101,8 @@
 	$: if (history.messages) {
 		if (JSON.stringify(message) !== JSON.stringify(history.messages[messageId])) {
 			message = JSON.parse(JSON.stringify(history.messages[messageId]));
+
+			sourcesPresent = false; // Reset the "Get Sources" button for each new message
 		}
 	}
 
@@ -140,6 +142,8 @@
 	let generatingImage = false;
 
 	let showRateComment = false;
+
+	let sourcesPresent = false; // sources toggle to hide Get Sources button after use
 
 	const copyToClipboard = async (text) => {
 		const res = await _copyToClipboard(text);
@@ -477,8 +481,6 @@
 
 		await tick();
 	});
-
-	let sourcesPresent = false; // sources toggle to hide Get Sources button after use
 </script>
 
 {#key message.id}
