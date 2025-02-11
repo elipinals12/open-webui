@@ -477,6 +477,10 @@
 
 		await tick();
 	});
+
+	let sourcesPresent = Object.values(history.messages).some(
+    	(msg) => msg.content && msg.content.includes('### Sources')
+	);
 </script>
 
 {#key message.id}
@@ -1213,7 +1217,7 @@
 
 									{#if isLastMessage}
 										{#each model?.actions ?? [] as action}
-											{#if action.name === "Get Sources"}
+											{#if !(action.name === "Get Sources" && sourcesPresent)}
 												<!-- No Tooltip for "Get Sources" -->
 												<button
 													type="button"
