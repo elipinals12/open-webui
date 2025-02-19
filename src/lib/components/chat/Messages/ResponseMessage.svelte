@@ -1288,23 +1288,28 @@
 												{#if !message.content.includes('### Sources')}
 													<Tooltip content="View Relevant Specification Chunks" placement="bottom">
 														<button
-															type="button"
-															class="{isLastMessage ? 'visible' : 'invisible group-hover:visible'} flex items-center gap-2 p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition"
-															on:click={() => actionMessage(action.id, message)}
+														  type="button"
+														  class="{isLastMessage ? 'visible' : 'invisible group-hover:visible'} 
+														         flex items-center gap-2 px-4 py-2 
+														         hover:bg-black/5 dark:hover:bg-white/5 
+														         rounded-lg dark:hover:text-white hover:text-black 
+														         transition whitespace-nowrap 
+														         min-w-max"
+														  on:click={() => actionMessage(action.id, message)}
 														>
-															{#if action.icon_url}
-																<div class="w-4 h-4">
-																	<img
-																		src={action.icon_url}
-																		class="w-4 h-4 {action.icon_url.includes('svg') ? 'dark:invert-[80%]' : ''}"
-																		style="fill: currentColor;"
-																		alt={action.name}
-																	/>
-																</div>
-															{:else}
-																<Sparkles strokeWidth="2.1" className="size-4" />
-															{/if}
-															<span>Get Sources</span>
+														  {#if action.icon_url}
+														    <div class="w-5 h-5">
+														      <img
+														        src={action.icon_url}
+														        class="w-5 h-5 {action.icon_url.includes('svg') ? 'dark:invert-[80%]' : ''}"
+														        style="fill: currentColor;"
+														        alt={action.name}
+														      />
+														    </div>
+														  {:else}
+														    <Sparkles strokeWidth="2.1" class="w-5 h-5" />
+														  {/if}
+														  <span class="text-base font-medium">Get Sources</span>
 														</button>
 													</Tooltip>
 												{/if}
