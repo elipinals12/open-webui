@@ -1282,7 +1282,8 @@
 										</Tooltip>
 									{/if}
 
-									{#if isLastMessage}
+									<!-- custom actions should default apply to all system responses not just last -->
+									<!-- {#if isLastMessage} -->
 										{#each model?.actions ?? [] as action}
 											{#if action.name === "Get Sources"}
 												<!-- hide the button if it was already used -->
@@ -1336,8 +1337,8 @@
 													</button>
 												</Tooltip>
 											{/if}
-										{/each}																								
-									{/if}
+										{/each}
+									<!-- {/if} -->
 								{/if}
 							{/if}
 						</div>
