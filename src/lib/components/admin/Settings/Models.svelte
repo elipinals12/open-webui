@@ -31,7 +31,7 @@
 	import ManageModelsModal from './Models/ManageModelsModal.svelte';
 
 	// Add dynamic import for models*.json
-	const modelFiles = import.meta.glob('../../../../../../saved_config/models*.json');
+	const modelFiles = import.meta.glob('../../../../../saved_config/models*.json');
 
 	let importFiles;
 	let modelsImportInputElement: HTMLInputElement;

@@ -10,7 +10,7 @@
 	import { exportConfig, importConfig } from '$lib/apis/configs';
 
 	// Add dynamic import for config*.json
-	const configFiles = import.meta.glob('../../../../saved_config/config*.json');
+	const configFiles = import.meta.glob('../../../../../saved_config/config*.json');
 
 	const i18n = getContext('i18n');
 
