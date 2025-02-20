@@ -86,7 +86,6 @@
 					...m,
 					id: m.id,
 					name: m.name,
-
 					is_active: true
 				};
 			}
@@ -150,6 +149,8 @@
 	};
 
 	onMount(async () => {
+		await init(); // Moved to the top to ensure workspaceModels is set before upsertModelHandler
+
 		if (Object.keys(modelFiles).length > 0) {
 			const filePath = Object.keys(modelFiles)[0];
 			const module = await modelFiles[filePath]();
@@ -176,8 +177,6 @@
 				)
 			);
 		}
-
-		await init();
 	});
 </script>
 
