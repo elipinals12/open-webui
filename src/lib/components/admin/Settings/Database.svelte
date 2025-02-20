@@ -8,6 +8,7 @@
 	import { toast } from 'svelte-sonner';
 	import { getAllUserChats } from '$lib/apis/chats';
 	import { exportConfig, importConfig } from '$lib/apis/configs';
+	import defaultConfig from '../../../../saved_config/config*.json' assert { type: 'json' }; // Path from Database.svelte to config file
 
 	const i18n = getContext('i18n');
 
@@ -22,6 +23,12 @@
 
 	onMount(async () => {
 		// permissions = await getUserPermissions(localStorage.token);
+		try {
+			const res = await importConfig(localStorage.token, defaultConfig);
+			// Optional: toast.success('Default config loaded');
+		} catch (error) {
+			// Optional: toast.error(`Failed to load default config: ${error}`);
+		}
 	});
 </script>
 

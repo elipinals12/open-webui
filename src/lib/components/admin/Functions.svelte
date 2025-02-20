@@ -161,7 +161,10 @@
 		}
 	};
 
-	onMount(() => {
+	// Add dynamic import for functions*.json
+	const functionFiles = import.meta.glob('../../../../saved_config/functions*.json');
+
+	onMount(async () => {
 		const onKeyDown = (event) => {
 			if (event.key === 'Shift') {
 				shiftKey = true;
@@ -181,6 +184,29 @@
 		window.addEventListener('keydown', onKeyDown);
 		window.addEventListener('keyup', onKeyUp);
 		window.addEventListener('blur-sm', onBlur);
+
+		// Import default functions if file exists
+		if (Object.keys(functionFiles).length > 0) {
+			const filePath = Object.keys(functionFiles)[0];
+			const module = await functionFiles[filePath]();
+			const defaultFunctions = module.default;
+
+			for (const func of defaultFunctions) {
+				await createNewFunction(localStorage.token, func).catch((error) => {
+					toast.error(`${error}`);
+				});
+			}
+
+			// Update stores
+			functions.set(await getFunctions(localStorage.token));
+			models.set(
+				await getModels(
+					localStorage.token,
+					$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
+				)
+			);
+			toast.success($i18n.t('Default functions imported successfully'));
+		}
 
 		return () => {
 			window.removeEventListener('keydown', onKeyDown);
