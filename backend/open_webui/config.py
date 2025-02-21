@@ -845,7 +845,7 @@ ENABLE_SIGNUP = PersistentConfig(
     "ENABLE_SIGNUP",
     "ui.enable_signup",
     (
-        False
+        True
         if not WEBUI_AUTH
         else os.environ.get("ENABLE_SIGNUP", "True").lower() == "true"
     ),
