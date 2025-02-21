@@ -30,9 +30,6 @@
 	import ArrowDownTray from '$lib/components/icons/ArrowDownTray.svelte';
 	import ManageModelsModal from './Models/ManageModelsModal.svelte';
 
-	// Add dynamic import for models*.json
-	const modelFiles = import.meta.glob('../../../../../saved_config/models*.json');
-
 	let importFiles;
 	let modelsImportInputElement: HTMLInputElement;
 
@@ -86,6 +83,7 @@
 					...m,
 					id: m.id,
 					name: m.name,
+
 					is_active: true
 				};
 			}
@@ -149,34 +147,7 @@
 	};
 
 	onMount(async () => {
-		await init(); // Moved to the top to ensure workspaceModels is set before upsertModelHandler
-
-		if (Object.keys(modelFiles).length > 0) {
-			const filePath = Object.keys(modelFiles)[0];
-			const module = await modelFiles[filePath]();
-			const defaultModels = module.default;
-
-			for (const model of defaultModels) {
-				if (Object.keys(model).includes('base_model_id')) {
-					if (model.base_model_id === null) {
-						await upsertModelHandler(model);
-					}
-				} else {
-					if (model?.info ?? false) {
-						if (model.info.base_model_id === null) {
-							await upsertModelHandler(model.info);
-						}
-					}
-				}
-			}
-
-			_models.set(
-				await getModels(
-					localStorage.token,
-					$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
-				)
-			);
-		}
+		init();
 	});
 </script>
 

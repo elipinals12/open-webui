@@ -9,9 +9,6 @@
 	import { getAllUserChats } from '$lib/apis/chats';
 	import { exportConfig, importConfig } from '$lib/apis/configs';
 
-	// Add dynamic import for config*.json
-	const configFiles = import.meta.glob('../../../../../saved_config/config*.json');
-
 	const i18n = getContext('i18n');
 
 	export let saveHandler: Function;
@@ -25,18 +22,6 @@
 
 	onMount(async () => {
 		// permissions = await getUserPermissions(localStorage.token);
-		if (Object.keys(configFiles).length > 0) {
-			const filePath = Object.keys(configFiles)[0];
-			const module = await configFiles[filePath]();
-			const defaultConfig = module.default;
-
-			try {
-				const res = await importConfig(localStorage.token, defaultConfig);
-				// Optional: toast.success('Default config loaded');
-			} catch (error) {
-				// Optional: toast.error(`Failed to load default config: ${error}`);
-			}
-		}
 	});
 </script>
 

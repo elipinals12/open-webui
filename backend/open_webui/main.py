@@ -9,6 +9,13 @@ import sys
 import time
 import random
 
+# for autoconfig
+from pathlib import Path
+from open_webui.config import save_config
+from open_webui.models.models import ModelModel, Models
+from open_webui.models.functions import FunctionModel, Functions
+from open_webui.utils.plugin import load_function_module_by_id
+
 from contextlib import asynccontextmanager
 from urllib.parse import urlencode, parse_qs, urlparse
 from pydantic import BaseModel
@@ -391,6 +398,38 @@ async def lifespan(app: FastAPI):
         get_license_data(app, app.state.config.LICENSE_KEY)
 
     asyncio.create_task(periodic_usage_pool_cleanup())
+
+    ########################################
+    #                                      #
+    #            ! AUTOCONFIG !            #
+    #                                      #
+    ########################################
+    # Auto-load configs, models, and functions from saved_config
+    config_dir = Path("/app/saved_config")
+    if config_dir.exists():
+        for file_path in config_dir.glob("*.json"):
+            with open(file_path, 'r') as f:
+                data = json.load(f)
+                file_name = file_path.name.lower()
+
+                if file_name.startswith("config") and file_name.endswith(".json"):
+                    save_config(data)  # From configs.py
+                    log.info(f"Loaded config from {file_name}")
+                elif file_name.startswith("models") and file_name.endswith(".json"):
+                    for model_data in data:
+                        model = ModelModel(**model_data)
+                        Models.insert_new_model(model, None)  # None for user at startup
+                        log.info(f"Loaded model: {model_data.get('id', 'unknown')}")
+                elif file_name.startswith("functions") and file_name.endswith(".json"):
+                    for func_data in data:
+                        func = FunctionModel(**func_data)
+                        Functions.insert_new_function(None, "function", func)  # None for user at startup
+                        app.state.FUNCTIONS[func.id] = load_function_module_by_id(func.id, content=func.content)[0]
+                        log.info(f"Loaded function: {func_data.get('id', 'unknown')}")
+        log.info("Auto-config initialization from saved_config complete.")
+    else:
+        log.info("No saved_config directory found, skipping auto-config initialization.")
+
     yield
 
 
