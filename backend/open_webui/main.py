@@ -418,12 +418,12 @@ async def lifespan(app: FastAPI):
                 elif file_name.startswith("models") and file_name.endswith(".json"):
                     for model_data in data:
                         model = ModelModel(**model_data)
-                        Models.insert_new_model(model, None)  # None for user at startup
+                        Models.insert_new_model(model, "system") # user: "system"
                         log.info(f"Loaded model: {model_data.get('id', 'unknown')}")
                 elif file_name.startswith("functions") and file_name.endswith(".json"):
                     for func_data in data:
                         func = FunctionModel(**func_data)
-                        Functions.insert_new_function(None, "function", func)  # None for user at startup
+                        Functions.insert_new_function("system", "function", func) # user: "system"
                         app.state.FUNCTIONS[func.id] = load_function_module_by_id(func.id, content=func.content)[0]
                         log.info(f"Loaded function: {func_data.get('id', 'unknown')}")
         log.info("Auto-config initialization from saved_config complete.")
