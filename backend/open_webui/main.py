@@ -345,7 +345,7 @@ from pathlib import Path
 from open_webui.config import save_config
 from open_webui.models.models import ModelModel, Models
 from open_webui.models.functions import Functions, FunctionForm
-from open_webui.routers.functions import create_new_function
+from open_webui.utils.plugin import load_function_module_by_id, replace_imports
 
 
 if SAFE_MODE:
@@ -415,7 +415,13 @@ async def lifespan(app: FastAPI):
                 if file_name.startswith("functions"):
                     for func_data in data:
                         form_data = FunctionForm(**func_data)
-                        create_new_function(Request(app), form_data, "system") # user: "system"
+                        form_data.content = replace_imports(form_data.content)
+                        function_module, function_type, frontmatter = load_function_module_by_id(
+                            form_data.id, content=form_data.content
+                        )
+                        form_data.meta.manifest = frontmatter
+                        app.state.FUNCTIONS[form_data.id] = function_module
+                        Functions.insert_new_function("system", function_type, form_data) # user: "system"
                         log.info(f"Loaded function: {func_data.get('id', 'unknown')}")
                 elif file_name.startswith("config"):
                     save_config(data)  # From configs.py
