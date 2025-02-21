@@ -457,9 +457,9 @@ async def signup(request: Request, response: Response, form_data: SignupForm):
             "admin" if user_count == 0 else request.app.state.config.DEFAULT_USER_ROLE
         )
 
-        if user_count == 0:
+        # no need for this, terrible
+        # if user_count == 0:
             # Disable signup after the first user is created
-            # terrible
             # request.app.state.config.ENABLE_SIGNUP = False
 
         hashed = get_password_hash(form_data.password)
