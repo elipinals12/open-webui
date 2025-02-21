@@ -9,13 +9,6 @@ import sys
 import time
 import random
 
-# for autoconfig
-from pathlib import Path
-from open_webui.config import save_config
-from open_webui.models.models import ModelModel, Models
-from open_webui.models.functions import FunctionModel, Functions
-from open_webui.utils.plugin import load_function_module_by_id
-
 from contextlib import asynccontextmanager
 from urllib.parse import urlencode, parse_qs, urlparse
 from pydantic import BaseModel
@@ -347,6 +340,13 @@ from open_webui.utils.security_headers import SecurityHeadersMiddleware
 
 from open_webui.tasks import stop_task, list_tasks  # Import from tasks.py
 
+# for autoconfig
+from pathlib import Path
+from open_webui.config import save_config
+from open_webui.models.models import ModelModel, Models
+from open_webui.models.functions import Functions, FunctionForm
+from open_webui.routers.functions import create_new_function
+
 
 if SAFE_MODE:
     print("SAFE MODE ENABLED")
@@ -414,9 +414,8 @@ async def lifespan(app: FastAPI):
 
                 if file_name.startswith("functions"):
                     for func_data in data:
-                        func = FunctionModel(**func_data)
-                        Functions.insert_new_function("system", "function", func) # user: "system"
-                        app.state.FUNCTIONS[func.id] = load_function_module_by_id(func.id, content=func.content)[0]
+                        form_data = FunctionForm(**func_data)
+                        create_new_function(Request(app), form_data, "system") # user: "system"
                         log.info(f"Loaded function: {func_data.get('id', 'unknown')}")
                 elif file_name.startswith("config"):
                     save_config(data)  # From configs.py

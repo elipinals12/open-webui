@@ -459,7 +459,8 @@ async def signup(request: Request, response: Response, form_data: SignupForm):
 
         if user_count == 0:
             # Disable signup after the first user is created
-            request.app.state.config.ENABLE_SIGNUP = False
+            # terrible
+            # request.app.state.config.ENABLE_SIGNUP = False
 
         hashed = get_password_hash(form_data.password)
         user = Auths.insert_new_auth(
