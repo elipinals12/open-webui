@@ -412,14 +412,14 @@ async def lifespan(app: FastAPI):
                 data = json.load(f)
                 file_name = file_path.name.lower()
 
-                if file_name.startswith("config") and file_name.endswith(".json"):
-                    save_config(data)  # From configs.py
-                    log.info(f"Loaded config from {file_name}")
-                elif file_name.startswith("models") and file_name.endswith(".json"):
+                if file_name.startswith("models") and file_name.endswith(".json"):
                     for model_data in data:
                         model = ModelModel(**model_data)
                         Models.insert_new_model(model, "system") # user: "system"
                         log.info(f"Loaded model: {model_data.get('id', 'unknown')}")
+                elif file_name.startswith("config") and file_name.endswith(".json"):
+                    save_config(data)  # From configs.py
+                    log.info(f"Loaded config from {file_name}")
                 elif file_name.startswith("functions") and file_name.endswith(".json"):
                     for func_data in data:
                         func = FunctionModel(**func_data)
