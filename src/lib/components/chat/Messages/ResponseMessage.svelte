@@ -1303,7 +1303,7 @@
 									{#each model?.actions ?? [] as action}
 										{#if action.name === "Get Sources"}
 											<!-- hide the button if it was already used -->
-											{#if !message.content.includes('### Sources')}
+											{#if !message.content.includes(' Sources')}
 												<Tooltip content="View Relevant Specification Chunks" placement="bottom">
 													<button
 														type="button"
