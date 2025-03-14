@@ -1147,7 +1147,7 @@ TITLE_GENERATION_PROMPT_TEMPLATE = PersistentConfig(
 )
 
 DEFAULT_TITLE_GENERATION_PROMPT_TEMPLATE = """### Task:
-Generate a concise, 3-5 word title summarizing the chat history.
+Generate a concise, 3-5 word (<=20 character) title summarizing the chat history.
 ### Guidelines:
 - The title should clearly represent the main theme or subject of the conversation.
 - Avoid quotation marks or any special formatting.
@@ -1160,8 +1160,8 @@ JSON format: { "title": "your concise title here" }
 - { "title": "Perfect Chocolate Chip Recipe" },
 - { "title": "Evolution of Music Streaming" },
 - { "title": "Remote Work Productivity Tips" },
-- { "title": "Artificial Intelligence in Healthcare" },
-- { "title": "Video Game Development Insights" }
+- { "title": "A.I. in Healthcare" },
+- { "title": "Game Development Insights" }
 ### Chat History:
 <chat_history>
 {{MESSAGES:END:2}}
