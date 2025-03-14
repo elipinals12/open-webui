@@ -176,4 +176,7 @@ ARG BUILD_HASH
 ENV WEBUI_BUILD_VERSION=${BUILD_HASH}
 ENV DOCKER=true
 
+# disable login
+ENV WEBUI_AUTH=false
+
 CMD [ "bash", "start.sh"]
