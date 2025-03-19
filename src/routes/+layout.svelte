@@ -1,4 +1,27 @@
 <script>
+	// for O-RAN hashed user ID by browswer
+	import { onMount } from 'svelte';
+
+	function generateRandomID() {
+		return 'xxxx-xxxx-xxxx-xxxx'.replace(/x/g, () => Math.floor(Math.random() * 16).toString(16));
+	}
+
+	let userID = localStorage.getItem('userID');
+	let showDisclaimer = localStorage.getItem('disclaimerAccepted') !== 'true';
+
+	onMount(() => {
+		if (!userID) {
+			userID = generateRandomID();
+			localStorage.setItem('userID', userID);
+		}
+	});
+
+	function acceptDisclaimer() {
+		localStorage.setItem('disclaimerAccepted', 'true');
+		showDisclaimer = false;
+	}
+
+
 	import { io } from 'socket.io-client';
 	import { spring } from 'svelte/motion';
 	import PyodideWorker from '$lib/workers/pyodide.worker?worker';
@@ -574,6 +597,35 @@
 	<!-- <link rel="stylesheet" type="text/css" href="/themes/rosepine.css" />
 	<link rel="stylesheet" type="text/css" href="/themes/rosepine-dawn.css" /> -->
 </svelte:head>
+
+
+<!-- O-RAN disclaimer code -->
+{#if showDisclaimer}
+  <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black/80 dark:bg-black/90 z-50">
+    <div class="p-6 max-w-lg text-center text-white dark:text-gray-100 overflow-auto max-h-[80vh]">
+      <h1 class="text-2xl mb-4">Open RAN LLM ChatBot Benchmarking</h1>
+      <p class="text-left">
+        Northeastern University<br>
+        Human Subject Research Protection<br>
+        Open RAN LLM ChatBot Benchmarking<br>
+        You are being asked to participate in a research study being done by Michele Polese and Maxime Elkael at Northeastern University. Your participation is voluntary, and you are free to withdraw at any time.<br><br>
+        The purpose of this study is to evaluate the accuracy of responses of an LLM-based ChatBot that can be prompted on Open RAN topics. Participating in this research study will include prompting the LLM, evaluating the response, and providing your feedback on the accuracy of the response with a quantitative input. The survey will take less than a minute to complete for every prompt.<br><br>
+        Faculty, students, and staff who may see your information will maintain confidentiality to the extent of federal and state laws and university policies. Personal identifiers will not be published or presented. Your de-identified information could be used for future research without additional informed consent.<br><br>
+        If you have any questions about the research study, please contact Michele Polese at m.polese@northeastem.edu. If you have questions or concerns about your rights as a participant, please contact Northeastern University's Human Research Protection Program at IRBReview@northeastem.edu.<br><br>
+        Online studies:<br>
+        It is possible that respondents could be identified by the IP address or other electronic record associated with the response. Neither the researcher nor anyone involved with this survey will be capturing those data. Identifiers will be hashed so that it is not possible to identify the participant. If you have any questions regarding electronic privacy, please feel free to contact Northeastern University's Office of Information Security at privacy@neu.edu<br><br>
+        Version date: 8/24/2023
+      </p>
+      <button 
+        on:click={acceptDisclaimer} 
+        class="mt-4 bg-gray-700/50 hover:bg-gray-700/70 dark:bg-gray-100/10 dark:hover:bg-gray-100/20 p-2 rounded-full"
+      >
+        I Accept
+      </button>
+    </div>
+  </div>
+{/if}
+
 
 {#if loaded}
 	{#if $isApp}
