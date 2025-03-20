@@ -609,14 +609,13 @@
 	>
 		<div class="p-6 max-w-lg text-center text-white dark:text-gray-100 overflow-auto max-h-[80vh]">
 			<img
-				src="/static/assets/images/HumanSubjectResearchProtection.png"
+				src="/assets/images/HumanSubjectResearchProtection.png"
 				alt="Northeastern University - Human Subject Research Protection"
 				class="mb-4 mx-auto max-w-full h-auto"
 			/>
 			<h1 class="text-2xl mb-4 text-blue-300">O-RAN ChatBot Disclaimer</h1>
+			<h2 class="text-2xl mb-4 text-blue-300">Open RAN LLM ChatBot Benchmarking</h2>
 			<p class="text-left">
-				Northeastern University<br />
-				Open RAN LLM ChatBot Benchmarking<br />
 				You are being asked to participate in a research study being done by Michele Polese and Maxime
 				Elkael at Northeastern University. Your participation is voluntary, and you are free to withdraw
 				at any time.<br /><br />
@@ -630,12 +629,12 @@
 				or presented. Your de-identified information could be used for future research without additional
 				informed consent.<br /><br />
 				If you have any questions about the research study, please contact Michele Polese at <a
-					href="mailto:m.polese@northeastem.edu"
-					class="underline hover:text-gray-300">m.polese@northeastem.edu</a>. If you have questions or
+					href="mailto:m.polese@northeastern.edu"
+					class="underline hover:text-gray-300">m.polese@northeastern.edu</a>. If you have questions or
 				concerns about your rights as a participant, please contact Northeastern University's Human Research
 				Protection Program at <a
-					href="mailto:IRBReview@northeastem.edu"
-					class="underline hover:text-gray-300">IRBReview@northeastem.edu</a>.<br /><br />
+					href="mailto:IRBReview@northeastern.edu"
+					class="underline hover:text-gray-300">IRBReview@northeastern.edu</a>.<br /><br />
 				<span class="bg-yellow-400 text-black">Online studies:</span><br />
 				It is possible that respondents could be identified by the IP address or other electronic record
 				associated with the response. Neither the researcher nor anyone involved with this survey will
