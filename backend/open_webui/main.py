@@ -437,7 +437,7 @@ async def lifespan(app: FastAPI):
                         form_data.meta.manifest = frontmatter
                         app.state.FUNCTIONS[form_data.id] = function_module
                         Functions.insert_new_function("system", function_type, form_data) # user: "system"
-                        log.info(f"Loaded function: {func_data.get('id', 'unknown')}")
+                        # log.info(f"Loaded function: {func_data.get('id', 'unknown')}")
                 elif file_name.startswith("config"):
                     save_config(data)  # From configs.py
                     log.info(f"Loaded config from {file_name}")
@@ -445,7 +445,7 @@ async def lifespan(app: FastAPI):
                     for model_data in data:
                         model = ModelModel(**model_data)
                         Models.insert_new_model(model, "system") # user: "system"
-                        log.info(f"Loaded model: {model_data.get('id', 'unknown')}")
+                        # log.info(f"Loaded model: {model_data.get('id', 'unknown')}")
                 
         log.info("Auto-config initialization from saved_config complete.")
     else:

@@ -601,16 +601,21 @@
 	<link rel="stylesheet" type="text/css" href="/themes/rosepine-dawn.css" /> -->
 </svelte:head>
 
+
 <!-- O-RAN disclaimer code -->
 {#if showDisclaimer}
 	<div
 		class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black/80 dark:bg-black/90 z-50"
 	>
 		<div class="p-6 max-w-lg text-center text-white dark:text-gray-100 overflow-auto max-h-[80vh]">
-			<h1 class="text-2xl mb-4">Open RAN LLM ChatBot Disclaimer</h1>
+			<img
+				src="../../static/assets/images/HumanSubjectResearchProtection.png"
+				alt="Northeastern University - Human Subject Research Protection"
+				class="mb-4 mx-auto max-w-full h-auto"
+			/>
+			<h1 class="text-2xl mb-4 text-blue-300">O-RAN ChatBot Disclaimer</h1>
 			<p class="text-left">
 				Northeastern University<br />
-				Human Subject Research Protection<br />
 				Open RAN LLM ChatBot Benchmarking<br />
 				You are being asked to participate in a research study being done by Michele Polese and Maxime
 				Elkael at Northeastern University. Your participation is voluntary, and you are free to withdraw
@@ -624,16 +629,22 @@
 				extent of federal and state laws and university policies. Personal identifiers will not be published
 				or presented. Your de-identified information could be used for future research without additional
 				informed consent.<br /><br />
-				If you have any questions about the research study, please contact Michele Polese at m.polese@northeastem.edu.
-				If you have questions or concerns about your rights as a participant, please contact Northeastern
-				University's Human Research Protection Program at IRBReview@northeastem.edu.<br /><br />
-				Online studies:<br />
+				If you have any questions about the research study, please contact Michele Polese at <a
+					href="mailto:m.polese@northeastem.edu"
+					class="underline hover:text-gray-300">m.polese@northeastem.edu</a>. If you have questions or
+				concerns about your rights as a participant, please contact Northeastern University's Human Research
+				Protection Program at <a
+					href="mailto:IRBReview@northeastem.edu"
+					class="underline hover:text-gray-300">IRBReview@northeastem.edu</a>.<br /><br />
+				<span class="bg-yellow-400 text-black">Online studies:</span><br />
 				It is possible that respondents could be identified by the IP address or other electronic record
 				associated with the response. Neither the researcher nor anyone involved with this survey will
 				be capturing those data. Identifiers will be hashed so that it is not possible to identify the
 				participant. If you have any questions regarding electronic privacy, please feel free to contact
-				Northeastern University's Office of Information Security at privacy@neu.edu<br /><br />
-				Version date: 8/24/2023
+				Northeastern University's Office of Information Security at <a
+					href="mailto:privacy@neu.edu"
+					class="underline hover:text-gray-300">privacy@neu.edu</a><br /><br />
+				<span class="text-sm text-gray-400">Version date: 8/24/2023</span>
 			</p>
 			<button
 				on:click={acceptDisclaimer}
@@ -644,6 +655,7 @@
 		</div>
 	</div>
 {/if}
+
 
 {#if loaded}
 	{#if $isApp}
