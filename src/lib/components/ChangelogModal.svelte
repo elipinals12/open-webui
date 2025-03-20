@@ -61,7 +61,8 @@
 	<div class=" w-full p-4 px-5 text-gray-700 dark:text-gray-100">
 		<div class=" overflow-y-scroll max-h-96 scrollbar-hidden">
 			<div class="mb-3">
-				{#if changelog}
+				<!-- hide changelog always -->
+				{#if false && changelog}
 					{#each Object.keys(changelog) as version}
 						<div class=" mb-3 pr-2">
 							<div class="font-semibold text-xl mb-1 dark:text-white">
