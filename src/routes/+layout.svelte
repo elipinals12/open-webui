@@ -9,13 +9,6 @@
 	let userID = localStorage.getItem('userID');
 	let showDisclaimer = localStorage.getItem('disclaimerAccepted') !== 'true';
 
-	onMount(() => {
-		if (!userID) {
-			userID = generateRandomID();
-			localStorage.setItem('userID', userID);
-		}
-	});
-
 	function acceptDisclaimer() {
 		localStorage.setItem('disclaimerAccepted', 'true');
 		showDisclaimer = false;
@@ -30,7 +23,7 @@
 		stiffness: 0.05
 	});
 
-	import { onMount, tick, setContext } from 'svelte';
+	import { tick, setContext } from 'svelte';
 	import {
 		config,
 		user,
@@ -419,6 +412,12 @@
 	};
 
 	onMount(async () => {
+		// gen and store rand user ID
+		if (!userID) {
+			userID = generateRandomID();
+			localStorage.setItem('userID', userID);
+		}
+		
 		if (typeof window !== 'undefined' && window.applyTheme) {
 			window.applyTheme();
 		}
@@ -603,7 +602,7 @@
 {#if showDisclaimer}
   <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black/80 dark:bg-black/90 z-50">
     <div class="p-6 max-w-lg text-center text-white dark:text-gray-100 overflow-auto max-h-[80vh]">
-      <h1 class="text-2xl mb-4">Open RAN LLM ChatBot Benchmarking</h1>
+      <h1 class="text-2xl mb-4">Open RAN LLM ChatBot Disclaimer</h1>
       <p class="text-left">
         Northeastern University<br>
         Human Subject Research Protection<br>
