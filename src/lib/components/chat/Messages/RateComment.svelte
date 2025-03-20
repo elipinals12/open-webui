@@ -77,6 +77,9 @@
 			);
 		}
 	});
+	
+	// hashedID for feedback
+	let userID = localStorage.getItem('userID');
 
 	const saveHandler = () => {
 		console.log('saveHandler');
@@ -86,9 +89,9 @@
 		// }
 
 		dispatch('save', {
+			user: userID,
 			reason: selectedReason,
 			comment: comment,
-			tags: tags.map((tag) => tag.name),
 			details: {
 				rating: detailedRating
 			}

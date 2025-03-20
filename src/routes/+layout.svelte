@@ -401,11 +401,6 @@
 		return 'xxxx-xxxx-xxxx-xxxx'.replace(/x/g, () => Math.floor(Math.random() * 16).toString(16));
 	}
 
-	let userID = localStorage.getItem('userID');
-	let showDisclaimer = localStorage.getItem('disclaimerAccepted') !== 'true';
-	console.log('Initial userID:', userID); // Log initial value
-	console.log('Initial showDisclaimer:', showDisclaimer); // Log initial state
-
 	function acceptDisclaimer() {
 		console.log('Accepting disclaimer'); // Check if button works
 		localStorage.setItem('disclaimerAccepted', 'true');
@@ -589,6 +584,11 @@
 			window.removeEventListener('resize', onResize);
 		};
 	});
+
+	let userID = localStorage.getItem('userID');
+	let showDisclaimer = localStorage.getItem('disclaimerAccepted') !== 'true';
+	console.log('Initial userID:', userID); // Log initial value
+	console.log('Initial showDisclaimer:', showDisclaimer); // Log initial state
 </script>
 
 <svelte:head>
@@ -601,24 +601,24 @@
 	<link rel="stylesheet" type="text/css" href="/themes/rosepine-dawn.css" /> -->
 </svelte:head>
 
-
 <!-- O-RAN disclaimer code -->
 {#if showDisclaimer}
 	<div
-		class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black dark:bg-black z-50"
+		class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black/50 dark:bg-black/60 z-50"
 	>
-		<div class="p-6 max-w-lg text-center text-white dark:text-gray-100 overflow-auto max-h-[80vh]">
+		<div
+			class="p-6 w-11/12 max-w-4xl bg-gray-800 dark:bg-gray-900 text-center text-white dark:text-gray-100 overflow-auto max-h-[85vh]"
+		>
 			<img
 				src="/assets/images/HumanSubjectResearchProtection.png"
 				alt="Northeastern University - Human Subject Research Protection"
 				class="mb-4 mx-auto max-w-full h-auto"
 			/>
-			<h1 class="text-2xl mb-4 text-blue-300">O-RAN ChatBot Disclaimer</h1>
-			<h2 class="text-2xl mb-4 text-blue-300">Open RAN LLM ChatBot Benchmarking</h2>
+			<h1 class="text-2xl mb-4 text-blue-300">Open RAN LLM ChatBot Benchmarking</h1>
 			<p class="text-left">
-				You are being asked to participate in a research study being done by Michele Polese and Maxime
-				Elkael at Northeastern University. Your participation is voluntary, and you are free to withdraw
-				at any time.<br /><br />
+				You are being asked to participate in a research study being done by Michele Polese and
+				Maxime Elkael at Northeastern University. Your participation is voluntary, and you are free
+				to withdraw at any time.<br /><br />
 				The purpose of this study is to evaluate the accuracy of responses of an LLM-based ChatBot that
 				can be prompted on Open RAN topics. Participating in this research study will include prompting
 				the LLM, evaluating the response, and providing your feedback on the accuracy of the response
@@ -628,21 +628,22 @@
 				extent of federal and state laws and university policies. Personal identifiers will not be published
 				or presented. Your de-identified information could be used for future research without additional
 				informed consent.<br /><br />
-				If you have any questions about the research study, please contact Michele Polese at <a
-					href="mailto:m.polese@northeastern.edu"
-					class="underline hover:text-gray-300">m.polese@northeastern.edu</a>. If you have questions or
-				concerns about your rights as a participant, please contact Northeastern University's Human Research
-				Protection Program at <a
-					href="mailto:IRBReview@northeastern.edu"
-					class="underline hover:text-gray-300">IRBReview@northeastern.edu</a>.<br /><br />
+				If you have any questions about the research study, please contact Michele Polese at
+				<a href="mailto:m.polese@northeastern.edu" class="underline hover:text-gray-300"
+					>m.polese@northeastern.edu</a
+				>. If you have questions or concerns about your rights as a participant, please contact
+				Northeastern University's Human Research Protection Program at
+				<a href="mailto:IRBReview@northeastern.edu" class="underline hover:text-gray-300"
+					>IRBReview@northeastern.edu</a
+				>.<br /><br />
 				<span class="bg-yellow-400 text-black">Online studies:</span><br />
 				It is possible that respondents could be identified by the IP address or other electronic record
 				associated with the response. Neither the researcher nor anyone involved with this survey will
 				be capturing those data. Identifiers will be hashed so that it is not possible to identify the
 				participant. If you have any questions regarding electronic privacy, please feel free to contact
-				Northeastern University's Office of Information Security at <a
-					href="mailto:privacy@neu.edu"
-					class="underline hover:text-gray-300">privacy@neu.edu</a><br /><br />
+				Northeastern University's Office of Information Security at
+				<a href="mailto:privacy@neu.edu" class="underline hover:text-gray-300">privacy@neu.edu</a
+				><br /><br />
 				<span class="text-sm text-gray-400">Version date: 8/24/2023</span>
 			</p>
 			<button
@@ -654,7 +655,6 @@
 		</div>
 	</div>
 {/if}
-
 
 {#if loaded}
 	{#if $isApp}
