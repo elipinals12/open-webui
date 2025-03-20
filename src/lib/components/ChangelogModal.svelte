@@ -22,6 +22,8 @@
 	});
 </script>
 
+<!-- always hide changelog -->
+{#if false}
 <Modal bind:show size="lg">
 	<div class="px-5 pt-4 dark:text-gray-300 text-gray-700">
 		<div class="flex justify-between items-start">
@@ -61,8 +63,7 @@
 	<div class=" w-full p-4 px-5 text-gray-700 dark:text-gray-100">
 		<div class=" overflow-y-scroll max-h-96 scrollbar-hidden">
 			<div class="mb-3">
-				<!-- hide changelog always -->
-				{#if false && changelog}
+				{#if changelog}
 					{#each Object.keys(changelog) as version}
 						<div class=" mb-3 pr-2">
 							<div class="font-semibold text-xl mb-1 dark:text-white">
@@ -119,3 +120,4 @@
 		</div>
 	</div>
 </Modal>
+{/if}
