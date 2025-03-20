@@ -1,20 +1,4 @@
 <script>
-	// for O-RAN hashed user ID by browswer
-	import { onMount } from 'svelte';
-
-	function generateRandomID() {
-		return 'xxxx-xxxx-xxxx-xxxx'.replace(/x/g, () => Math.floor(Math.random() * 16).toString(16));
-	}
-
-	let userID = localStorage.getItem('userID');
-	let showDisclaimer = localStorage.getItem('disclaimerAccepted') !== 'true';
-
-	function acceptDisclaimer() {
-		localStorage.setItem('disclaimerAccepted', 'true');
-		showDisclaimer = false;
-	}
-
-
 	import { io } from 'socket.io-client';
 	import { spring } from 'svelte/motion';
 	import PyodideWorker from '$lib/workers/pyodide.worker?worker';
@@ -23,7 +7,7 @@
 		stiffness: 0.05
 	});
 
-	import { tick, setContext } from 'svelte';
+	import { onMount, tick, setContext } from 'svelte';
 	import {
 		config,
 		user,
@@ -411,6 +395,21 @@
 		}
 	};
 
+
+	// for O-RAN hashed user ID by browswer
+	function generateRandomID() {
+		return 'xxxx-xxxx-xxxx-xxxx'.replace(/x/g, () => Math.floor(Math.random() * 16).toString(16));
+	}
+
+	let userID = localStorage.getItem('userID');
+	let showDisclaimer = localStorage.getItem('disclaimerAccepted') !== 'true';
+
+	function acceptDisclaimer() {
+		localStorage.setItem('disclaimerAccepted', 'true');
+		showDisclaimer = false;
+	}
+
+	
 	onMount(async () => {
 		// gen and store rand user ID
 		if (!userID) {
