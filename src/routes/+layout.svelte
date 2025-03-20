@@ -605,11 +605,11 @@
 <!-- O-RAN disclaimer code -->
 {#if showDisclaimer}
 	<div
-		class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black/80 dark:bg-black/90 z-50"
+		class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black dark:bg-black z-50"
 	>
 		<div class="p-6 max-w-lg text-center text-white dark:text-gray-100 overflow-auto max-h-[80vh]">
 			<img
-				src="../../static/assets/images/HumanSubjectResearchProtection.png"
+				src="/static/assets/images/HumanSubjectResearchProtection.png"
 				alt="Northeastern University - Human Subject Research Protection"
 				class="mb-4 mx-auto max-w-full h-auto"
 			/>
@@ -650,7 +650,7 @@
 				on:click={acceptDisclaimer}
 				class="mt-4 bg-gray-700/50 hover:bg-gray-700/70 dark:bg-gray-100/10 dark:hover:bg-gray-100/20 p-2 rounded-full"
 			>
-				I Accept
+				Understood
 			</button>
 		</div>
 	</div>

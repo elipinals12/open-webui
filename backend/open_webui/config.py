@@ -231,7 +231,7 @@ class PersistentConfig(Generic[T]):
         new_value = get_config_value(self.config_path)
         if new_value is not None:
             self.value = new_value
-            log.info(f"Updated {self.env_name} to new value {self.value}")
+            # log.info(f"Updated {self.env_name} to new value {self.value}")
 
     def save(self):
         log.info(f"Saving '{self.env_name}' to the database")
