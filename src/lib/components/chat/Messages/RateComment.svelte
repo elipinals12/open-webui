@@ -78,7 +78,7 @@
 		}
 	});
 	
-	// hashedID for feedback
+	// hashedUserID for feedback
 	let userID = localStorage.getItem('userID');
 
 	const saveHandler = () => {
