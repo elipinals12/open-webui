@@ -89,10 +89,10 @@
 		// }
 
 		dispatch('save', {
-			hashedUserID: userID,
 			reason: selectedReason,
 			comment: comment,
 			details: {
+				hashedUserID: userID,
 				rating: detailedRating
 			}
 		});
