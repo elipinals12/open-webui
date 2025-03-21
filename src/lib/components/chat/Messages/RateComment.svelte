@@ -89,7 +89,7 @@
 		// }
 
 		dispatch('save', {
-			user: userID,
+			hashedUserID: userID,
 			reason: selectedReason,
 			comment: comment,
 			details: {
