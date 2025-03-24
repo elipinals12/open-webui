@@ -56,7 +56,7 @@
 			<div class="flex self-center w-[1px] h-6 mx-2.5 bg-gray-200 dark:bg-gray-700" />
 			<div class="text-sm dark:text-gray-200">
 				v{WEBUI_VERSION}
-			</diwv>
+			</div>
 		</div>
 	</div>
 
