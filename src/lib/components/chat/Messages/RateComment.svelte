@@ -77,9 +77,6 @@
 			);
 		}
 	});
-	
-	// hashedUserID for feedback
-	let userID = localStorage.getItem('userID');
 
 	const saveHandler = () => {
 		console.log('saveHandler');
@@ -92,7 +89,6 @@
 			reason: selectedReason,
 			comment: comment,
 			details: {
-				hashedUserID: userID,
 				rating: detailedRating
 			}
 		});

@@ -395,14 +395,14 @@
 		}
 	};
 
-	// for O-RAN hashed user ID by browswer
+	// for O-RAN hashed user ID by browser
 	function generateRandomID() {
-		console.log('Generating new random ID'); // Check if this runs
+		console.log('Generating new random ID');
 		return 'xxxx-xxxx-xxxx-xxxx'.replace(/x/g, () => Math.floor(Math.random() * 16).toString(16));
 	}
 
 	function acceptDisclaimer() {
-		console.log('Accepting disclaimer'); // Check if button works
+		console.log('Accepting disclaimer');
 		localStorage.setItem('disclaimerAccepted', 'true');
 		showDisclaimer = false;
 		console.log('After accept - showDisclaimer:', showDisclaimer); // Confirm change
