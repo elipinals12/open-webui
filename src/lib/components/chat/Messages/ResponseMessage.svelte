@@ -410,7 +410,7 @@
 		const messages = createMessagesList(history, message.id);
 
 		let feedbackItem = {
-			user_id: localStorage.getItem('userID'), // custom userID based on browser
+			browser_id: localStorage.getItem('userID'), // custom userID based on browser
 			type: 'rating',
 			data: {
 				...(updatedMessage?.annotation ? updatedMessage.annotation : {}),

@@ -22,6 +22,7 @@ log.setLevel(SRC_LOG_LEVELS["MODELS"])
 class Feedback(Base):
     __tablename__ = "feedback"
     id = Column(Text, primary_key=True)
+    browser_id = Column(Text)
     user_id = Column(Text)
     version = Column(BigInteger, default=0)
     type = Column(Text)
@@ -34,6 +35,7 @@ class Feedback(Base):
 
 class FeedbackModel(BaseModel):
     id: str
+    browser_id: str
     user_id: str
     version: int
     type: str
@@ -53,6 +55,7 @@ class FeedbackModel(BaseModel):
 
 class FeedbackResponse(BaseModel):
     id: str
+    browser_id: str
     user_id: str
     version: int
     type: str
@@ -85,7 +88,7 @@ class SnapshotData(BaseModel):
 
 
 class FeedbackForm(BaseModel):
-    user_id: str
+    browser_id: str
     type: str
     data: Optional[RatingData] = None
     meta: Optional[dict] = None
@@ -95,13 +98,14 @@ class FeedbackForm(BaseModel):
 
 class FeedbackTable:
     def insert_new_feedback(
-        self, user_id: str, form_data: FeedbackForm
+        self, browser_id: str, user_id: str, form_data: FeedbackForm
     ) -> Optional[FeedbackModel]:
         with get_db() as db:
             id = str(uuid.uuid4())
             feedback = FeedbackModel(
                 **{
                     "id": id,
+                    "browser_id": browser_id,
                     "user_id": user_id,
                     "version": 0,
                     **form_data.model_dump(),
