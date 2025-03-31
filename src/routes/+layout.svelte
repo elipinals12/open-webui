@@ -626,7 +626,7 @@
 			<img
 				src="/assets/images/HumanSubjectResearchProtection.png"
 				alt="Northeastern University - Human Subject Research Protection"
-				class="mb-4 mx-auto max-w-full h-auto"
+				class="mb-4 mx-auto max-w-[300px] h-auto"
 			/>
 			<h1 class="text-2xl mb-4 text-blue-300">Open RAN LLM ChatBot Benchmarking</h1>
 			<p class="text-left">
