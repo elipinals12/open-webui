@@ -22,7 +22,6 @@ log.setLevel(SRC_LOG_LEVELS["MODELS"])
 class Feedback(Base):
     __tablename__ = "feedback"
     id = Column(Text, primary_key=True)
-    browser_id = Column(Text)
     user_id = Column(Text)
     version = Column(BigInteger, default=0)
     type = Column(Text)
@@ -31,11 +30,11 @@ class Feedback(Base):
     snapshot = Column(JSON, nullable=True)
     created_at = Column(BigInteger)
     updated_at = Column(BigInteger)
+    browser_id = Column(Text)
 
 
 class FeedbackModel(BaseModel):
     id: str
-    browser_id: str
     user_id: str
     version: int
     type: str
@@ -46,6 +45,7 @@ class FeedbackModel(BaseModel):
     updated_at: int
 
     model_config = ConfigDict(from_attributes=True)
+    browser_id: str
 
 
 ####################
@@ -55,7 +55,6 @@ class FeedbackModel(BaseModel):
 
 class FeedbackResponse(BaseModel):
     id: str
-    browser_id: str
     user_id: str
     version: int
     type: str
@@ -63,6 +62,7 @@ class FeedbackResponse(BaseModel):
     meta: Optional[dict] = None
     created_at: int
     updated_at: int
+    browser_id: str
 
 
 class RatingData(BaseModel):
@@ -88,12 +88,12 @@ class SnapshotData(BaseModel):
 
 
 class FeedbackForm(BaseModel):
-    browser_id: str
     type: str
     data: Optional[RatingData] = None
     meta: Optional[dict] = None
     snapshot: Optional[SnapshotData] = None
     model_config = ConfigDict(extra="allow")
+    browser_id: str
 
 
 class FeedbackTable:
@@ -105,12 +105,12 @@ class FeedbackTable:
             feedback = FeedbackModel(
                 **{
                     "id": id,
-                    "browser_id": browser_id,
                     "user_id": user_id,
                     "version": 0,
                     **form_data.model_dump(),
                     "created_at": int(time.time()),
                     "updated_at": int(time.time()),
+                    "browser_id": browser_id
                 }
             )
             try:
