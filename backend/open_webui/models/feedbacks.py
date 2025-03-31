@@ -85,6 +85,7 @@ class SnapshotData(BaseModel):
 
 
 class FeedbackForm(BaseModel):
+    user_id: str
     type: str
     data: Optional[RatingData] = None
     meta: Optional[dict] = None
