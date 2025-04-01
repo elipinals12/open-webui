@@ -98,7 +98,7 @@ class FeedbackForm(BaseModel):
 
 class FeedbackTable:
     def insert_new_feedback(
-        self, browser_id: str, user_id: str, form_data: FeedbackForm
+        self, user_id: str, form_data: FeedbackForm, browser_id: str
     ) -> Optional[FeedbackModel]:
         with get_db() as db:
             id = str(uuid.uuid4())
