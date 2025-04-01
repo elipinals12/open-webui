@@ -639,6 +639,20 @@
 	<link rel="stylesheet" type="text/css" href="/themes/rosepine-dawn.css" /> -->
 </svelte:head>
 
+{#if loaded}
+	{#if $isApp}
+		<div class="flex flex-row h-screen">
+			<AppSidebar />
+
+			<div class="w-full flex-1 max-w-[calc(100%-4.5rem)]">
+				<slot />
+			</div>
+		</div>
+	{:else}
+		<slot />
+	{/if}
+{/if}
+
 <!-- O-RAN disclaimer code -->
 {#if showDisclaimer}
 	<div
@@ -692,20 +706,6 @@
 			</button>
 		</div>
 	</div>
-{/if}
-
-{#if loaded}
-	{#if $isApp}
-		<div class="flex flex-row h-screen">
-			<AppSidebar />
-
-			<div class="w-full flex-1 max-w-[calc(100%-4.5rem)]">
-				<slot />
-			</div>
-		</div>
-	{:else}
-		<slot />
-	{/if}
 {/if}
 
 <Toaster
