@@ -656,12 +656,18 @@
 <!-- O-RAN disclaimer code -->
 {#if showDisclaimer}
 	<div
-	class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black/50 dark:bg-black/60 z-50"
+		class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black/50 dark:bg-black/60 z-50"
 	>
 		<div
-		  class="p-5 w-11/12 h-4/5 max-w-screen-xl bg-gray-800 dark:bg-gray-900 text-center text-white dark:text-gray-100 overflow-hidden"
+  			style="
+				width: min(calc(100% - 32px), 91.67%); 
+				height: min(calc(100% - 32px), 91.67%);
+				max-width: 1280px;
+				max-height: 750px;
+  			"
+  			class="bg-gray-800 dark:bg-gray-900 text-center text-white dark:text-gray-100 overflow-hidden"
 		>
-			<div class="p-5 w-full h-full overflow-auto">
+  			<div class="p-5 w-full h-full overflow-auto">
 				<img
 					src="/assets/images/HumanSubjectResearchProtection.png"
 					alt="Northeastern University - Human Subject Research Protection"
