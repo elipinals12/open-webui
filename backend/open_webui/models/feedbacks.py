@@ -45,7 +45,7 @@ class FeedbackModel(BaseModel):
     updated_at: int
 
     model_config = ConfigDict(from_attributes=True)
-    browser_id: str
+    browser_id: Optional[str] = None
 
 
 ####################
@@ -62,7 +62,7 @@ class FeedbackResponse(BaseModel):
     meta: Optional[dict] = None
     created_at: int
     updated_at: int
-    browser_id: str
+    browser_id: Optional[str] = None
 
 
 class RatingData(BaseModel):
@@ -93,7 +93,7 @@ class FeedbackForm(BaseModel):
     meta: Optional[dict] = None
     snapshot: Optional[SnapshotData] = None
     model_config = ConfigDict(extra="allow")
-    browser_id: str
+    browser_id: Optional[str] = None
 
 
 class FeedbackTable:
