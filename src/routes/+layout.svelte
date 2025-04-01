@@ -659,12 +659,12 @@
 		class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black/50 dark:bg-black/60 z-50"
 	>
 		<div
-			class="p-0 w-11/12 max-w-screen-2xl bg-gray-800 dark:bg-gray-900 text-center text-white dark:text-gray-100 overflow-auto max-h-[90vh]"
+			class="p-6 w-11/12 max-w-screen-xl bg-gray-800 dark:bg-gray-900 text-center text-white dark:text-gray-100 overflow-auto max-h-[85vh]"
 		>
 			<img
 				src="/assets/images/HumanSubjectResearchProtection.png"
 				alt="Northeastern University - Human Subject Research Protection"
-				class="mb-4 mx-auto max-w-full h-auto"
+				class="mb-4 mx-auto max-w-[300px] h-auto"
 			/>
 			<h1 class="text-2xl mb-4 text-blue-300">Open RAN LLM ChatBot Benchmarking</h1>
 			<p class="text-left">
