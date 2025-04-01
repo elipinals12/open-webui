@@ -370,6 +370,7 @@ from open_webui.config import save_config
 from open_webui.models.models import ModelModel, Models
 from open_webui.models.functions import Functions, FunctionForm
 from open_webui.utils.plugin import load_function_module_by_id, replace_imports
+from open_webui.utils.redis import get_sentinels_from_env
 
 
 if SAFE_MODE:
@@ -473,6 +474,7 @@ app = FastAPI(
 
 oauth_manager = OAuthManager(app)
 
+app.state.config = AppConfig(
     redis_url=REDIS_URL,
     redis_sentinels=get_sentinels_from_env(REDIS_SENTINEL_HOSTS, REDIS_SENTINEL_PORT),
 )
