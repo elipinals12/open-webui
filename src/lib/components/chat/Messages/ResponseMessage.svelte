@@ -24,9 +24,7 @@
 		getMessageContentParts,
 		sanitizeResponseContent,
 		createMessagesList,
-		formatDate,
-		removeDetails,
-		removeAllDetails
+		formatDate
 	} from '$lib/utils';
 	import { WEBUI_BASE_URL } from '$lib/constants';
 
@@ -47,7 +45,6 @@
 	import CodeExecutions from './CodeExecutions.svelte';
 	import ContentRenderer from './ContentRenderer.svelte';
 	import { KokoroWorker } from '$lib/workers/KokoroWorker';
-	import FileItem from '$lib/components/common/FileItem.svelte';
 
 	interface MessageType {
 		id: string;
@@ -155,9 +152,7 @@
 	let showRateComment = false;
 
 	const copyToClipboard = async (text) => {
-		text = removeAllDetails(text);
-
-		const res = await _copyToClipboard(text, $settings?.copyFormatted ?? false);
+		const res = await _copyToClipboard(text);
 		if (res) {
 			toast.success($i18n.t('Copying to clipboard was successful!'));
 		}
@@ -619,6 +614,18 @@
 			</Name>
 
 			<div>
+				{#if message?.files && message.files?.filter((f) => f.type === 'image').length > 0}
+					<div class="my-2.5 w-full flex overflow-x-auto gap-2 flex-wrap">
+						{#each message.files as file}
+							<div>
+								{#if file.type === 'image'}
+									<Image src={file.url} alt={message.content} />
+								{/if}
+							</div>
+						{/each}
+					</div>
+				{/if}
+
 				<div class="chat-{message.role} w-full min-w-full markdown-prose">
 					<div>
 						{#if (message?.statusHistory ?? [...(message?.status ? [message?.status] : [])]).length > 0}
@@ -695,27 +702,6 @@
 									{/if}
 								</div>
 							{/if}
-						{/if}
-
-						{#if message?.files && message.files?.filter((f) => f.type === 'image').length > 0}
-							<div class="my-1 w-full flex overflow-x-auto gap-2 flex-wrap">
-								{#each message.files as file}
-									<div>
-										{#if file.type === 'image'}
-											<Image src={file.url} alt={message.content} />
-										{:else}
-											<FileItem
-												item={file}
-												url={file.url}
-												name={file.name}
-												type={file.type}
-												size={file?.size}
-												colorClassName="bg-white dark:bg-gray-850 "
-											/>
-										{/if}
-									</div>
-								{/each}
-							</div>
 						{/if}
 
 						{#if edit === true}
@@ -1025,85 +1011,83 @@
 									</button>
 								</Tooltip>
 
-								{#if $user?.role === 'admin' || ($user?.permissions?.chat?.tts ?? true)}
-									<Tooltip content={$i18n.t('Read Aloud')} placement="bottom">
-										<button
-											id="speak-button-{message.id}"
-											class="{isLastMessage
-												? 'visible'
-												: 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition"
-											on:click={() => {
-												if (!loadingSpeech) {
-													toggleSpeakMessage();
-												}
-											}}
-										>
-											{#if loadingSpeech}
-												<svg
-													class=" w-4 h-4"
-													fill="currentColor"
-													viewBox="0 0 24 24"
-													xmlns="http://www.w3.org/2000/svg"
-												>
-													<style>
-														.spinner_S1WN {
-															animation: spinner_MGfb 0.8s linear infinite;
-															animation-delay: -0.8s;
-														}
+								<Tooltip content={$i18n.t('Read Aloud')} placement="bottom">
+									<button
+										id="speak-button-{message.id}"
+										class="{isLastMessage
+											? 'visible'
+											: 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition"
+										on:click={() => {
+											if (!loadingSpeech) {
+												toggleSpeakMessage();
+											}
+										}}
+									>
+										{#if loadingSpeech}
+											<svg
+												class=" w-4 h-4"
+												fill="currentColor"
+												viewBox="0 0 24 24"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<style>
+													.spinner_S1WN {
+														animation: spinner_MGfb 0.8s linear infinite;
+														animation-delay: -0.8s;
+													}
 
-														.spinner_Km9P {
-															animation-delay: -0.65s;
-														}
+													.spinner_Km9P {
+														animation-delay: -0.65s;
+													}
 
-														.spinner_JApP {
-															animation-delay: -0.5s;
-														}
+													.spinner_JApP {
+														animation-delay: -0.5s;
+													}
 
-														@keyframes spinner_MGfb {
-															93.75%,
-															100% {
-																opacity: 0.2;
-															}
+													@keyframes spinner_MGfb {
+														93.75%,
+														100% {
+															opacity: 0.2;
 														}
-													</style>
-													<circle class="spinner_S1WN" cx="4" cy="12" r="3" />
-													<circle class="spinner_S1WN spinner_Km9P" cx="12" cy="12" r="3" />
-													<circle class="spinner_S1WN spinner_JApP" cx="20" cy="12" r="3" />
-												</svg>
-											{:else if speaking}
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													viewBox="0 0 24 24"
-													stroke-width="2.3"
-													stroke="currentColor"
-													class="w-4 h-4"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z"
-													/>
-												</svg>
-											{:else}
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													viewBox="0 0 24 24"
-													stroke-width="2.3"
-													stroke="currentColor"
-													class="w-4 h-4"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"
-													/>
-												</svg>
-											{/if}
-										</button>
-									</Tooltip>
-								{/if}
+													}
+												</style>
+												<circle class="spinner_S1WN" cx="4" cy="12" r="3" />
+												<circle class="spinner_S1WN spinner_Km9P" cx="12" cy="12" r="3" />
+												<circle class="spinner_S1WN spinner_JApP" cx="20" cy="12" r="3" />
+											</svg>
+										{:else if speaking}
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke-width="2.3"
+												stroke="currentColor"
+												class="w-4 h-4"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z"
+												/>
+											</svg>
+										{:else}
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke-width="2.3"
+												stroke="currentColor"
+												class="w-4 h-4"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"
+												/>
+											</svg>
+										{/if}
+									</button>
+								</Tooltip>
 
 								{#if $config?.features.enable_image_generation && ($user?.role === 'admin' || $user?.permissions?.features?.image_generation) && !readOnly}
 									<Tooltip content={$i18n.t('Generate Image')} placement="bottom">
@@ -1319,7 +1303,7 @@
 										</Tooltip>
 									{/if}
 
-									<!-- custom actions should apply to all responses not just last -->
+									<!-- custom actions should default apply to all system responses not just last -->
 									<!-- {#if isLastMessage} -->
 									{#each model?.actions ?? [] as action}
 										{#if action.name === "Get Sources"}
@@ -1377,45 +1361,44 @@
 										{/if}
 									{/each}
 									<!-- {/if} -->
-									<!-- moving feedback to end for visibility -->
-									{#if !readOnly && !$temporaryChatEnabled && ($config?.features.enable_message_rating ?? true)}
-									    <div class="ml-auto flex items-center">
-									        <div class="border-l border-gray-300 dark:border-gray-600 h-4 mx-2"></div>
-									        <span class="text-sm text-gray-600 dark:text-gray-400">How'd I do?</span>
-									        <Tooltip content={$i18n.t('Good Response')} placement="bottom">
-									            <button
-									                class="{isLastMessage ? 'visible' : 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg {(message?.annotation?.rating ?? '').toString() === '1' ? 'bg-gray-100 dark:bg-gray-800' : ''} dark:hover:text-white hover:text-black transition disabled:cursor-progress disabled:hover:bg-transparent"
-									                disabled={feedbackLoading}
-									                on:click={async () => {
-									                    await feedbackHandler(1);
-									                    window.setTimeout(() => {
-									                        document.getElementById(`message-feedback-${message.id}`)?.scrollIntoView();
-									                    }, 0);
-									                }}
-									            >
-									                <svg stroke="currentColor" fill="none" stroke-width="2.3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg">
-									                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
-									                </svg>
-									            </button>
-									        </Tooltip>
-									        <Tooltip content={$i18n.t('Bad Response')} placement="bottom">
-									            <button
-									                class="{isLastMessage ? 'visible' : 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg {(message?.annotation?.rating ?? '').toString() === '-1' ? 'bg-gray-100 dark:bg-gray-800' : ''} dark:hover:text-white hover:text-black transition disabled:cursor-progress disabled:hover:bg-transparent"
-									                disabled={feedbackLoading}
-									                on:click={async () => {
-									                    await feedbackHandler(-1);
-									                    window.setTimeout(() => {
-									                        document.getElementById(`message-feedback-${message.id}`)?.scrollIntoView();
-									                    }, 0);
-									                }}
-									            >
-									                <svg stroke="currentColor" fill="none" stroke-width="2.3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg">
-									                    <path d="M10 15v4a3 3 0 0 0 3 3l-4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
-									                </svg>
-									            </button>
-									        </Tooltip>
-									    </div>
-									{/if}
+                                    {#if !readOnly && !$temporaryChatEnabled && ($config?.features.enable_message_rating ?? true)}
+                                        <div class="flex items-center">
+                                            <div class="border-l border-gray-300 dark:border-gray-600 h-4 mx-2"></div>
+                                            <span class="text-sm text-gray-600 dark:text-gray-400">How'd I do?</span>
+                                            <Tooltip content={$i18n.t('Good Response')} placement="bottom">
+                                                <button
+                                                    class="{isLastMessage ? 'visible' : 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg {(message?.annotation?.rating ?? '').toString() === '1' ? 'bg-gray-100 dark:bg-gray-800' : ''} dark:hover:text-white hover:text-black transition disabled:cursor-progress disabled:hover:bg-transparent"
+                                                    disabled={feedbackLoading}
+                                                    on:click={async () => {
+                                                        await feedbackHandler(1);
+                                                        window.setTimeout(() => {
+                                                            document.getElementById(`message-feedback-${message.id}`)?.scrollIntoView();
+                                                        }, 0);
+                                                    }}
+                                                >
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2.3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+                                                    </svg>
+                                                </button>
+                                            </Tooltip>
+                                            <Tooltip content={$i18n.t('Bad Response')} placement="bottom">
+                                                <button
+                                                    class="{isLastMessage ? 'visible' : 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg {(message?.annotation?.rating ?? '').toString() === '-1' ? 'bg-gray-100 dark:bg-gray-800' : ''} dark:hover:text-white hover:text-black transition disabled:cursor-progress disabled:hover:bg-transparent"
+                                                    disabled={feedbackLoading}
+                                                    on:click={async () => {
+                                                        await feedbackHandler(-1);
+                                                        window.setTimeout(() => {
+                                                            document.getElementById(`message-feedback-${message.id}`)?.scrollIntoView();
+                                                        }, 0);
+                                                    }}
+                                                >
+                                                    <svg stroke="currentColor" fill="none" stroke-width="2.3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M10 15v4a3 3 0 0 0 3 3l-4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
+                                                    </svg>
+                                                </button>
+                                            </Tooltip>
+                                        </div>
+                                    {/if}
 								{/if}
 							{/if}
 						{/if}
