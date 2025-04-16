@@ -1307,7 +1307,6 @@
 									<!-- {#if isLastMessage} -->
 									{#each model?.actions ?? [] as action}
 										{#if action.name === "Get Sources"}
-											<span class="mx-2 text-gray-400">|</span>
 											<Tooltip content="View Relevant Specification Chunks" placement="bottom">
 											  <button
 												type="button"
@@ -1364,8 +1363,9 @@
 									<!-- {/if} -->
 
 									<!-- move feedback to end -->
-        							<span class="mx-2 text-gray-400">|</span>
 									{#if !$temporaryChatEnabled && ($config?.features.enable_message_rating ?? true)}
+        								<span class="mx-2 text-gray-400">|</span>
+										<span class="text-base font-medium">How'd I do?</span>
 										<Tooltip content={$i18n.t('Good Response')} placement="bottom">
 											<button
 												class="{isLastMessage
