@@ -673,7 +673,7 @@
 				<img
 					src="/assets/images/O-RAN/Open6G+PWSCIF.png"
 					alt="Northeastern University - Human Subject Research Protection"
-					class="mb-4 mx-auto max-w-[250px] w-full h-auto"
+					class="mb-4 mx-auto max-w-[200px] w-full h-auto"
 				/>
 				<h1 class="text-2xl mb-4 text-blue-300">Open RAN LLM ChatBot Benchmarking</h1>
 				<b class="text-left">Before you can use the O-RAN LLM ChatBot, please read this disclaimer:<br/><br/></b>
