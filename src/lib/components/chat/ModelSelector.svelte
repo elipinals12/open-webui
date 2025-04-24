@@ -54,7 +54,7 @@
 				</div>
 			</div>
 
-			<!-- if false to never allow mult. models..$$render.$$render. temp while alt. models fix on OC -->
+			<!-- if false to never allow mult. models..$$render.$$render. temp while alt. models is fixed on OC -->
 			{#if false && $user?.role === 'admin' || ($user?.permissions?.chat?.multiple_models ?? true)}
 				{#if selectedModelIdx === 0}
 					<div
