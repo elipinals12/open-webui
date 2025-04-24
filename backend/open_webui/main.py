@@ -452,27 +452,48 @@ async def lifespan(app: FastAPI):
             with open(file_path, 'r') as f:
                 data = json.load(f)
                 file_name = file_path.name.lower()
-
+                
                 if file_name.startswith("functions"):
                     for func_data in data:
                         form_data = FunctionForm(**func_data)
-                        form_data.content = replace_imports(form_data.content)
-                        function_module, function_type, frontmatter = load_function_module_by_id(
-                            form_data.id, content=form_data.content
-                        )
-                        form_data.meta.manifest = frontmatter
-                        app.state.FUNCTIONS[form_data.id] = function_module
-                        Functions.insert_new_function("system", function_type, form_data) # user: "system"
-                        # log.info(f"Loaded function: {func_data.get('id', 'unknown')}")
+                        # Check if function already exists using the Session you already have
+                        existing_function = Session.query(Functions.model).filter(Functions.model.id == form_data.id).first()
+                        
+                        if not existing_function:
+                            # Process and insert new function
+                            form_data.content = replace_imports(form_data.content)
+                            function_module, function_type, frontmatter = load_function_module_by_id(
+                                form_data.id, content=form_data.content
+                            )
+                            form_data.meta.manifest = frontmatter
+                            app.state.FUNCTIONS[form_data.id] = function_module
+                            Functions.insert_new_function("system", function_type, form_data)
+                            log.info(f"Added new function: {form_data.id}")
+                        else:
+                            # Still load the function module into app state
+                            form_data.content = replace_imports(form_data.content)
+                            function_module, function_type, _ = load_function_module_by_id(
+                                form_data.id, content=form_data.content
+                            )
+                            app.state.FUNCTIONS[form_data.id] = function_module
+                            log.info(f"Function {form_data.id} already exists, loaded in app state only")
+                        
                 elif file_name.startswith("config"):
                     save_config(data)  # From configs.py
                     log.info(f"Loaded config from {file_name}")
+                    
                 elif file_name.startswith("models"):
                     for model_data in data:
                         model = ModelModel(**model_data)
-                        Models.insert_new_model(model, "system") # user: "system"
-                        # log.info(f"Loaded model: {model_data.get('id', 'unknown')}")
-                
+                        # Check if model already exists
+                        existing_model = Session.query(Models.model).filter(Models.model.id == model.id).first()
+                        
+                        if not existing_model:
+                            Models.insert_new_model(model, "system")
+                            log.info(f"Added new model: {model.id}")
+                        else:
+                            log.info(f"Model {model.id} already exists, skipping")
+            
         log.info("Auto-config initialization from saved_config complete.")
     else:
         log.info("No saved_config directory found, skipping auto-config initialization.")
