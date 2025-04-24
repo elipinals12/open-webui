@@ -454,9 +454,10 @@ async def signup(request: Request, response: Response, form_data: SignupForm):
             "admin" if user_count == 0 else request.app.state.config.DEFAULT_USER_ROLE
         )
 
-        if user_count == 0:
+        # no need for this, terrible
+        # if user_count == 0:
             # Disable signup after the first user is created
-            request.app.state.config.ENABLE_SIGNUP = False
+            # request.app.state.config.ENABLE_SIGNUP = False
 
         # The password passed to bcrypt must be 72 bytes or fewer. If it is longer, it will be truncated before hashing.
         if len(form_data.password.encode("utf-8")) > 72:

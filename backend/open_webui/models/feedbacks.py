@@ -30,6 +30,7 @@ class Feedback(Base):
     snapshot = Column(JSON, nullable=True)
     created_at = Column(BigInteger)
     updated_at = Column(BigInteger)
+    browser_id = Column(Text)
 
 
 class FeedbackModel(BaseModel):
@@ -44,6 +45,7 @@ class FeedbackModel(BaseModel):
     updated_at: int
 
     model_config = ConfigDict(from_attributes=True)
+    browser_id: Optional[str] = None
 
 
 ####################
@@ -60,6 +62,7 @@ class FeedbackResponse(BaseModel):
     meta: Optional[dict] = None
     created_at: int
     updated_at: int
+    browser_id: Optional[str] = None
 
 
 class RatingData(BaseModel):
@@ -90,11 +93,12 @@ class FeedbackForm(BaseModel):
     meta: Optional[dict] = None
     snapshot: Optional[SnapshotData] = None
     model_config = ConfigDict(extra="allow")
+    browser_id: Optional[str] = None
 
 
 class FeedbackTable:
     def insert_new_feedback(
-        self, user_id: str, form_data: FeedbackForm
+        self, user_id: str, form_data: FeedbackForm, browser_id: str
     ) -> Optional[FeedbackModel]:
         with get_db() as db:
             id = str(uuid.uuid4())
@@ -106,6 +110,7 @@ class FeedbackTable:
                     **form_data.model_dump(),
                     "created_at": int(time.time()),
                     "updated_at": int(time.time()),
+                    "browser_id": browser_id
                 }
             )
             try:

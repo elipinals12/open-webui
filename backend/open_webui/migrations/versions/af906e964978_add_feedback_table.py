@@ -43,6 +43,9 @@ def upgrade():
         sa.Column(
             "updated_at", sa.BigInteger(), nullable=False
         ),  # Feedback update timestamp (BIGINT representing epoch)
+        sa.Column(
+            "browser_id", sa.Text(), nullable=True
+        ),  # ORAN ADDITION - ID of the user providing the feedback (TEXT type) by browser
     )
 
 

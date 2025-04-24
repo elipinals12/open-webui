@@ -44,7 +44,7 @@ class FunctionModel(BaseModel):
     type: str
     content: str
     meta: FunctionMeta
-    is_active: bool = False
+    is_active: bool = True # default to active
     is_global: bool = False
     updated_at: int  # timestamp in epoch
     created_at: int  # timestamp in epoch

@@ -55,13 +55,16 @@ ENV ENV=prod \
     USE_EMBEDDING_MODEL_DOCKER=${USE_EMBEDDING_MODEL} \
     USE_RERANKING_MODEL_DOCKER=${USE_RERANKING_MODEL}
 
+ENV WEBUI_NAME="O-RAN ChatBot"
+
 ## Basis URL Config ##
 ENV OLLAMA_BASE_URL="/ollama" \
     OPENAI_API_BASE_URL=""
 
 ## API Key and Security Config ##
 ENV OPENAI_API_KEY="" \
-    WEBUI_SECRET_KEY="" \
+    WEBUI_SECRET_KEY="Nhnrc8nTVndT" \
+    # ^^^^^^ need secret key set to avoid permission error
     SCARF_NO_ANALYTICS=true \
     DO_NOT_TRACK=true \
     ANONYMIZED_TELEMETRY=false
@@ -162,6 +165,9 @@ COPY --chown=$UID:$GID --from=build /app/package.json /app/package.json
 
 # copy backend files
 COPY --chown=$UID:$GID ./backend .
+
+# Copy saved_config
+COPY --chown=$UID:$GID ./saved_config /app/saved_config
 
 EXPOSE 8080
 

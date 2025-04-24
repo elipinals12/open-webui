@@ -15,8 +15,6 @@
 	let LIKE_REASONS = [
 		'accurate_information',
 		'followed_instructions_perfectly',
-		'showcased_creativity',
-		'positive_attitude',
 		'attention_to_detail',
 		'thorough_explanation',
 		'other'
@@ -90,7 +88,6 @@
 		dispatch('save', {
 			reason: selectedReason,
 			comment: comment,
-			tags: tags.map((tag) => tag.name),
 			details: {
 				rating: detailedRating
 			}
@@ -187,10 +184,6 @@
 							{$i18n.t('Accurate information')}
 						{:else if reason === 'followed_instructions_perfectly'}
 							{$i18n.t('Followed instructions perfectly')}
-						{:else if reason === 'showcased_creativity'}
-							{$i18n.t('Showcased creativity')}
-						{:else if reason === 'positive_attitude'}
-							{$i18n.t('Positive attitude')}
 						{:else if reason === 'attention_to_detail'}
 							{$i18n.t('Attention to detail')}
 						{:else if reason === 'thorough_explanation'}

@@ -120,7 +120,7 @@ async def create_feedback(
     form_data: FeedbackForm,
     user=Depends(get_verified_user),
 ):
-    feedback = Feedbacks.insert_new_feedback(user_id=user.id, form_data=form_data)
+    feedback = Feedbacks.insert_new_feedback(user_id=user.id, form_data=form_data, browser_id=form_data.browser_id)
     if not feedback:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

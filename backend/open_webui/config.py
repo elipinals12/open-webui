@@ -240,7 +240,7 @@ class PersistentConfig(Generic[T]):
         new_value = get_config_value(self.config_path)
         if new_value is not None:
             self.value = new_value
-            log.info(f"Updated {self.env_name} to new value {self.value}")
+            # log.info(f"Updated {self.env_name} to new value {self.value}")
 
     def save(self):
         log.info(f"Saving '{self.env_name}' to the database")
@@ -1295,21 +1295,21 @@ TITLE_GENERATION_PROMPT_TEMPLATE = PersistentConfig(
 )
 
 DEFAULT_TITLE_GENERATION_PROMPT_TEMPLATE = """### Task:
-Generate a concise, 3-5 word title with an emoji summarizing the chat history.
+Generate a concise, 3-5 word (<=20 character) title summarizing the chat history.
 ### Guidelines:
 - The title should clearly represent the main theme or subject of the conversation.
-- Use emojis that enhance understanding of the topic, but avoid quotation marks or special formatting.
+- Avoid quotation marks or any special formatting.
 - Write the title in the chat's primary language; default to English if multilingual.
 - Prioritize accuracy over excessive creativity; keep it clear and simple.
 ### Output:
 JSON format: { "title": "your concise title here" }
 ### Examples:
-- { "title": "📉 Stock Market Trends" },
-- { "title": "🍪 Perfect Chocolate Chip Recipe" },
+- { "title": "Stock Market Trends" },
+- { "title": "Perfect Chocolate Chip Recipe" },
 - { "title": "Evolution of Music Streaming" },
 - { "title": "Remote Work Productivity Tips" },
-- { "title": "Artificial Intelligence in Healthcare" },
-- { "title": "🎮 Video Game Development Insights" }
+- { "title": "A.I. in Healthcare" },
+- { "title": "Game Development Insights" }
 ### Chat History:
 <chat_history>
 {{MESSAGES:END:2}}
@@ -1424,7 +1424,7 @@ Strictly return in JSON format:
 ENABLE_AUTOCOMPLETE_GENERATION = PersistentConfig(
     "ENABLE_AUTOCOMPLETE_GENERATION",
     "task.autocomplete.enable",
-    os.environ.get("ENABLE_AUTOCOMPLETE_GENERATION", "False").lower() == "true",
+    os.environ.get("ENABLE_AUTOCOMPLETE_GENERATION", "True").lower() == "true",
 )
 
 AUTOCOMPLETE_GENERATION_INPUT_MAX_LENGTH = PersistentConfig(

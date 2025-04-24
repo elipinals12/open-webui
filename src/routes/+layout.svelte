@@ -432,7 +432,28 @@
 		}
 	};
 
+	// for O-RAN hashed user ID by browser
+	function generateRandomID() {
+		console.log('Generating new random ID');
+		return 'xxxx-xxxx-xxxx-xxxx'.replace(/x/g, () => Math.floor(Math.random() * 16).toString(16));
+	}
+
+	function acceptDisclaimer() {
+		console.log('Accepting disclaimer');
+		localStorage.setItem('disclaimerAccepted', 'true');
+		showDisclaimer = false;
+		console.log('After accept - showDisclaimer:', showDisclaimer); // Confirm change
+	}
+
 	onMount(async () => {
+		// gen and store userID
+		console.log('onMount running'); // Confirm onMount fires
+		if (!userID) {
+			userID = generateRandomID();
+			localStorage.setItem('userID', userID);
+			console.log('New userID set:', userID); // Log new ID
+		}
+
 		if (typeof window !== 'undefined' && window.applyTheme) {
 			window.applyTheme();
 		}
@@ -603,6 +624,11 @@
 			window.removeEventListener('resize', onResize);
 		};
 	});
+
+	let userID = localStorage.getItem('userID');
+	let showDisclaimer = localStorage.getItem('disclaimerAccepted') !== 'true';
+	console.log('Initial userID:', userID); // Log initial value
+	console.log('Initial showDisclaimer:', showDisclaimer); // Log initial state
 </script>
 
 <svelte:head>
@@ -627,6 +653,69 @@
 	{:else}
 		<slot />
 	{/if}
+{/if}
+
+<!-- O-RAN disclaimer code -->
+{#if showDisclaimer}
+	<div
+		class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black/50 dark:bg-black/60 z-50"
+	>
+		<div
+  			style="
+				width: min(calc(100% - 16px), 97%); 
+				height: min(calc(100% - 16px), 94%);
+				max-width: 1400px;
+				max-height: 750px;
+  			"
+  			class="bg-gray-800 dark:bg-gray-900 text-center text-white dark:text-gray-100 overflow-hidden"
+		>
+  			<div class="p-5 w-full h-full overflow-auto">
+				<img
+					src="/assets/images/O-RAN/Open6G+PWSCIF.png"
+					alt="Northeastern University - Human Subject Research Protection"
+					class="mb-4 mx-auto max-w-[200px] w-full h-auto"
+				/>
+				<h1 class="text-2xl mb-4 text-blue-300">Open RAN LLM ChatBot Benchmarking</h1>
+				<b class="text-left">Before you can use the O-RAN ChatBot ChatBot, please read this disclaimer:<br/><br/></b>
+				<p class="text-left">
+					You are being asked to participate in a research study being done by Michele Polese and
+					Maxime Elkael at Northeastern University. Your participation is voluntary, and you are free
+					to withdraw at any time.<br /><br />
+					The purpose of this study is to evaluate the accuracy of responses of an LLM-based ChatBot that
+					can be prompted on Open RAN topics. Participating in this research study will include prompting
+					the LLM, evaluating the response, and providing your feedback on the accuracy of the response
+					with a quantitative input. The survey will take less than a minute to complete for every prompt.<br
+					/><br />
+					Faculty, students, and staff who may see your information will maintain confidentiality to the
+					extent of federal and state laws and university policies. Personal identifiers will not be published
+					or presented. Your de-identified information could be used for future research without additional
+					informed consent.<br /><br />
+					If you have any questions about the research study, please contact Michele Polese at
+					<a href="mailto:m.polese@northeastern.edu" class="underline hover:text-gray-300"
+						>m.polese@northeastern.edu</a
+					>. If you have questions or concerns about your rights as a participant, please contact
+					Northeastern University's Human Research Protection Program at
+					<a href="mailto:IRBReview@northeastern.edu" class="underline hover:text-gray-300"
+						>IRBReview@northeastern.edu</a
+					>.<br /><br />
+					It is possible that respondents could be identified by the IP address or other electronic record
+					associated with the response. Neither the researcher nor anyone involved with this survey will
+					be capturing those data. Identifiers will be hashed so that it is not possible to identify the
+					participant. If you have any questions regarding electronic privacy, please feel free to contact
+					Northeastern University's Office of Information Security at
+					<a href="mailto:privacy@neu.edu" class="underline hover:text-gray-300">privacy@neu.edu</a
+					><br /><br />
+					<span class="text-sm text-gray-400">Version date: 8/24/2023</span>
+				</p>
+				<button
+					on:click={acceptDisclaimer}
+					class="mt-4 bg-gray-700/50 hover:bg-gray-700/70 dark:bg-gray-100/10 dark:hover:bg-gray-100/20 p-2 rounded-full"
+				>
+					Understood
+				</button>
+			</div>
+		</div>
+	</div>
 {/if}
 
 <Toaster

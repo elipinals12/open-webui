@@ -195,6 +195,8 @@
 		>
 			<div class="w-full sm:max-w-md px-10 min-h-screen flex flex-col text-center">
 				{#if ($config?.features.auth_trusted_header ?? false) || $config?.features.auth === false}
+				<!-- hide "Signing in" message with the "false &&" below -->
+				{#if false}
 					<div class=" my-auto pb-10 w-full">
 						<div
 							class="flex items-center justify-center gap-3 text-xl sm:text-2xl text-center font-semibold dark:text-gray-200"
@@ -208,6 +210,7 @@
 							</div>
 						</div>
 					</div>
+				{/if}
 				{:else}
 					<div class="  my-auto pb-10 w-full dark:text-gray-100">
 						<form
