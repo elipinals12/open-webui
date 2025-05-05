@@ -19,7 +19,7 @@
 	import Pagination from '$lib/components/common/Pagination.svelte';
 	import FeedbackMenu from './FeedbackMenu.svelte';
 	import EllipsisHorizontal from '$lib/components/icons/EllipsisHorizontal.svelte';
-	import ChartBarSquare from '$lib/components/icons/ChartBarSquare.svelte';
+	import ChartBar from '$lib/components/icons/ChartBar.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
 
 	export let feedbacks = [];
@@ -273,7 +273,7 @@
 					class="p-2 rounded-xl hover:bg-gray-100 dark:bg-gray-900 dark:hover:bg-gray-850 transition font-medium text-sm flex items-center space-x-1"
 					on:click={toggleFeedbackAnalysis}
 				>
-					<ChartBarSquare className="size-3" />
+					<ChartBar className="size-3" />
 				</button>
 			</Tooltip>
 		{/if}
