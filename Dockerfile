@@ -55,6 +55,8 @@ ENV ENV=prod \
     USE_EMBEDDING_MODEL_DOCKER=${USE_EMBEDDING_MODEL} \
     USE_RERANKING_MODEL_DOCKER=${USE_RERANKING_MODEL}
 
+ENV WEBUI_NAME="O-RAN ChatBot"
+
 ## Basis URL Config ##
 ENV OLLAMA_BASE_URL="/ollama" \
     OPENAI_API_BASE_URL=""
@@ -164,8 +166,8 @@ COPY --chown=$UID:$GID --from=build /app/package.json /app/package.json
 # copy backend files
 COPY --chown=$UID:$GID ./backend .
 
-# Copy saved_config
-COPY --chown=$UID:$GID ./saved_config /app/saved_config
+# Copy saved_config (deprecated)
+# COPY --chown=$UID:$GID ./saved_config /app/saved_config
 
 EXPOSE 8080
 

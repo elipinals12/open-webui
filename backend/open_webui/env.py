@@ -106,10 +106,12 @@ for source in log_sources:
 log.setLevel(SRC_LOG_LEVELS["CONFIG"])
 
 WEBUI_NAME = os.environ.get("WEBUI_NAME", "Open WebUI")
-if WEBUI_NAME != "Open WebUI":
-    WEBUI_NAME += " (Open WebUI)"
+# if WEBUI_NAME != "Open WebUI":
+#     WEBUI_NAME += " (Open WebUI)"
+# ^ No need for this, want it to just say O-RAN
 
-WEBUI_FAVICON_URL = "https://openwebui.com/favicon.png"
+# WEBUI_FAVICON_URL = "https://openwebui.com/favicon.png"
+WEBUI_FAVICON_URL = "https://cdn.prod.website-files.com/60b1962ffda0a42f779c765b/60bf0ba863bfda974d1e8ceb_Logo%20oran.png" # O-RAN logo
 
 TRUSTED_SIGNATURE_KEY = os.environ.get("TRUSTED_SIGNATURE_KEY", "")
 

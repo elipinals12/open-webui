@@ -380,11 +380,12 @@ from open_webui.tasks import (
 )  # Import from tasks.py
 
 # for autoconfig
-from pathlib import Path
-from open_webui.config import save_config
-from open_webui.models.models import ModelModel, Models
-from open_webui.models.functions import Functions, FunctionForm
-from open_webui.utils.plugin import load_function_module_by_id, replace_imports
+# from pathlib import Path
+# from open_webui.config import save_config
+# from open_webui.models.models import ModelModel, Models
+# from open_webui.models.functions import Functions, FunctionForm
+# from open_webui.utils.plugin import load_function_module_by_id, replace_imports
+
 from open_webui.utils.redis import get_sentinels_from_env
 
 
@@ -446,37 +447,38 @@ async def lifespan(app: FastAPI):
     #                                      #
     ########################################
     # Auto-load configs, models, and functions from saved_config
-    config_dir = Path("/app/saved_config")
-    if config_dir.exists():
-        for file_path in config_dir.glob("*.json"):
-            with open(file_path, 'r') as f:
-                data = json.load(f)
-                file_name = file_path.name.lower()
+    # config_dir = Path("/app/saved_config")
+    # if config_dir.exists():
+    #     for file_path in config_dir.glob("*.json"):
+    #         with open(file_path, 'r') as f:
+    #             data = json.load(f)
+    #             file_name = file_path.name.lower()
 
-                if file_name.startswith("functions"):
-                    for func_data in data:
-                        form_data = FunctionForm(**func_data)
-                        form_data.content = replace_imports(form_data.content)
-                        function_module, function_type, frontmatter = load_function_module_by_id(
-                            form_data.id, content=form_data.content
-                        )
-                        form_data.meta.manifest = frontmatter
-                        app.state.FUNCTIONS[form_data.id] = function_module
-                        Functions.insert_new_function("system", function_type, form_data) # user: "system"
-                        # log.info(f"Loaded function: {func_data.get('id', 'unknown')}")
-                elif file_name.startswith("config"):
-                    save_config(data)  # From configs.py
-                    log.info(f"Loaded config from {file_name}")
-                elif file_name.startswith("models"):
-                    for model_data in data:
-                        model = ModelModel(**model_data)
-                        Models.insert_new_model(model, "system") # user: "system"
-                        # log.info(f"Loaded model: {model_data.get('id', 'unknown')}")
+    #             if file_name.startswith("functions"):
+    #                 for func_data in data:
+    #                     form_data = FunctionForm(**func_data)
+    #                     form_data.content = replace_imports(form_data.content)
+    #                     function_module, function_type, frontmatter = load_function_module_by_id(
+    #                         form_data.id, content=form_data.content
+    #                     )
+    #                     form_data.meta.manifest = frontmatter
+    #                     app.state.FUNCTIONS[form_data.id] = function_module
+    #                     Functions.insert_new_function("system", function_type, form_data) # user: "system"
+    #                     # log.info(f"Loaded function: {func_data.get('id', 'unknown')}")
+    #             elif file_name.startswith("config"):
+    #                 save_config(data)  # From configs.py
+    #                 log.info(f"Loaded config from {file_name}")
+    #             elif file_name.startswith("models"):
+    #                 for model_data in data:
+    #                     model = ModelModel(**model_data)
+    #                     Models.insert_new_model(model, "system") # user: "system"
+    #                     # log.info(f"Loaded model: {model_data.get('id', 'unknown')}")
                 
-        log.info("Auto-config initialization from saved_config complete.")
-    else:
-        log.info("No saved_config directory found, skipping auto-config initialization.")
-
+    #     log.info("Auto-config initialization from saved_config complete.")
+    # else:
+    #     log.info("No saved_config directory found, skipping auto-config initialization.")
+    # ^^^^^^^^^^ commented out autoconfig because it interferes with built in persistent data config
+     
     yield
 
 

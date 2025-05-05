@@ -1197,7 +1197,7 @@
 
 								{#if !readOnly}
 									{#if isLastMessage}
-										{#if model?.name !== "O-RAN LLM"}
+										{#if model?.name !== "O-RAN ChatBot"}
 											<Tooltip content={$i18n.t('Continue Response')} placement="bottom">
 												<button
 													type="button"
