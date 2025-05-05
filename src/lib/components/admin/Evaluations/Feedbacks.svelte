@@ -61,9 +61,16 @@
 						content: string;
 						annotation?: string;
 						feedbackId?: string;
+						error?: {
+							content: string;
+						};
 					}>;
 				};
 			};
+		};
+		meta?: {
+			model_id?: string;
+			tags?: string[];
 		};
 	};
 
@@ -141,6 +148,21 @@
 	//
 	//////////////////////
 
+	// Add some debugging to help trace issues
+	const debugStructure = (item) => {
+		console.log('Feedback item structure:', {
+			id: item.id,
+			hasSnapshot: !!item.snapshot,
+			title: item.snapshot?.chat?.title,
+			messages: !!item.snapshot?.chat?.chat?.messages,
+			messageCount: item.snapshot?.chat?.chat?.messages?.length || 0
+		});
+		
+		if (item.snapshot?.chat?.chat?.messages?.length > 0) {
+			console.log('First message structure:', item.snapshot.chat.chat.messages[0]);
+		}
+	};
+
 	const toggleFeedbackAnalysis = () => {
 		showFeedbackAnalysis = !showFeedbackAnalysis;
 		if (showFeedbackAnalysis && parsedFeedbacksData.length === 0) {
@@ -157,6 +179,9 @@
 		negativeCount = 0;
 		
 		feedbackData.forEach(item => {
+			// Debug the structure of each item to help diagnose issues
+			debugStructure(item);
+			
 			const rating = item.data?.rating;
 			if (rating > 0) positiveCount++;
 			else if (rating < 0) negativeCount++;
@@ -224,10 +249,16 @@
 			const hasFeedback = message.annotation || message.feedbackId;
 			const feedbackHighlight = hasFeedback ? 'border-2 border-red-500 dark:border-red-400' : '';
 			
+			// Check for content availability and handle error messages
+			let displayContent = message.content || '';
+			if (message.error && message.error.content) {
+				displayContent += `<div class="text-red-500 dark:text-red-400 text-xs mt-1">${message.error.content}</div>`;
+			}
+			
 			return `
 				<div class="${className} ${feedbackHighlight}">
 					<div class="font-medium text-gray-700 dark:text-gray-300">${isUser ? 'User' : 'Assistant'}</div>
-					<div class="text-sm mt-1 text-gray-600 dark:text-gray-300">${message.content}</div>
+					<div class="text-sm mt-1 text-gray-600 dark:text-gray-300">${displayContent}</div>
 					${hasFeedback ? '<div class="text-red-500 dark:text-red-400 text-xs font-medium mt-1">[This message received feedback]</div>' : ''}
 				</div>
 			`;
@@ -522,7 +553,8 @@
 		<div class="space-y-4 mb-4">
 			{#each parsedFeedbacksData as item (item.id)}
 				<div class={`bg-white dark:bg-gray-900 p-4 rounded-lg border-l-4 ${item.data.rating > 0 ? 'border-emerald-500' : item.data.rating < 0 ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}>
-					<h3 class="text-base font-medium text-gray-800 dark:text-gray-200 mb-2">{item.snapshot?.chat?.title || $i18n.t('Untitled Chat')}</h3>
+					<div>
+					<h3 class="text-base font-medium text-gray-800 dark:text-gray-200 mb-2">{item.snapshot?.chat?.title || item.meta?.model_id || $i18n.t('Untitled Chat')}</h3>
 					
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
 						<div>
@@ -559,6 +591,7 @@
 							{/if}
 						</div>
 					</div>
+				</div>
 				</div>
 			{/each}
 		</div>
