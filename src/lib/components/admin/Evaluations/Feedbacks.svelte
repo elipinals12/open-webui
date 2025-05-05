@@ -23,7 +23,8 @@
 	import XMark from '$lib/components/icons/XMark.svelte';
 
 	export let feedbacks = [];
-	let parsedFeedbacksData = [];
+	let originalFeedbacksData = []; // Store the original data
+	let parsedFeedbacksData = []; // Store the filtered data for display
 	let showFeedbackAnalysis = false;
 	let activeFilter = 'all';
 	let searchQuery = '';
@@ -148,7 +149,7 @@
 	};
 
 	const processFeedbackData = (feedbackData) => {
-		parsedFeedbacksData = feedbackData;
+		originalFeedbacksData = [...feedbackData]; // Store a copy of the original data
 		
 		// Calculate summary statistics
 		totalItems = feedbackData.length;
@@ -169,7 +170,8 @@
 		activeFilter = filterType;
 		searchQuery = query;
 		
-		let filteredItems = [...parsedFeedbacksData];
+		// Always start with the original data
+		let filteredItems = [...originalFeedbacksData];
 		
 		// Apply rating filter
 		if (filterType === 'positive') {
@@ -200,7 +202,11 @@
 			});
 		}
 		
+		// Set the display data to the filtered results
 		parsedFeedbacksData = filteredItems;
+		
+		// For debugging
+		console.log(`Filter: ${filterType}, Query: "${query}", Results: ${filteredItems.length}/${originalFeedbacksData.length}`);
 	};
 	
 	const formatConversation = (messages) => {
@@ -235,11 +241,13 @@
 		try {
 			const refreshedFeedbacks = await exportAllFeedbacks(localStorage.token);
 			if (refreshedFeedbacks) {
+				// Process the fresh data
 				processFeedbackData(refreshedFeedbacks);
 				toast.success($i18n.t('Feedback analysis refreshed successfully!'));
 			}
 		} catch (err) {
 			toast.error(err);
+			console.error("Error refreshing feedback analysis:", err);
 		}
 	};
 </script>
