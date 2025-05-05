@@ -19,8 +19,14 @@
 	import Pagination from '$lib/components/common/Pagination.svelte';
 	import FeedbackMenu from './FeedbackMenu.svelte';
 	import EllipsisHorizontal from '$lib/components/icons/EllipsisHorizontal.svelte';
+	import ChartBarSquare from '$lib/components/icons/ChartBarSquare.svelte';
+	import XMark from '$lib/components/icons/XMark.svelte';
 
 	export let feedbacks = [];
+	let parsedFeedbacksData = [];
+	let showFeedbackAnalysis = false;
+	let activeFilter = 'all';
+	let searchQuery = '';
 
 	let page = 1;
 	$: paginatedFeedbacks = feedbacks.slice((page - 1) * 10, page * 10);
@@ -34,12 +40,30 @@
 			reason: string;
 			comment: string;
 			tags: string[];
+			details?: {
+				rating?: number;
+			};
 		};
 		user: {
 			name: string;
 			profile_image_url: string;
 		};
 		updated_at: number;
+		created_at?: number;
+		browser_id?: string;
+		snapshot?: {
+			chat: {
+				title: string;
+				chat: {
+					messages: Array<{
+						role: string;
+						content: string;
+						annotation?: string;
+						feedbackId?: string;
+					}>;
+				};
+			};
+		};
 	};
 
 	type ModelStats = {
@@ -47,6 +71,11 @@
 		won: number;
 		lost: number;
 	};
+
+	// Summary stats for parser view
+	let totalItems = 0;
+	let positiveCount = 0;
+	let negativeCount = 0;
 
 	//////////////////////
 	//
@@ -104,6 +133,115 @@
 			saveAs(blob, `feedback-history-export-${Date.now()}.json`);
 		}
 	};
+
+	//////////////////////
+	//
+	// Feedback Parser Functions
+	//
+	//////////////////////
+
+	const toggleFeedbackAnalysis = () => {
+		showFeedbackAnalysis = !showFeedbackAnalysis;
+		if (showFeedbackAnalysis && parsedFeedbacksData.length === 0) {
+			processFeedbackData([...feedbacks]);
+		}
+	};
+
+	const processFeedbackData = (feedbackData) => {
+		parsedFeedbacksData = feedbackData;
+		
+		// Calculate summary statistics
+		totalItems = feedbackData.length;
+		positiveCount = 0;
+		negativeCount = 0;
+		
+		feedbackData.forEach(item => {
+			const rating = item.data?.rating;
+			if (rating > 0) positiveCount++;
+			else if (rating < 0) negativeCount++;
+		});
+		
+		// Set initial filter to show all items
+		filterFeedbackItems('all', '');
+	};
+	
+	const filterFeedbackItems = (filterType, query = '') => {
+		activeFilter = filterType;
+		searchQuery = query;
+		
+		let filteredItems = [...parsedFeedbacksData];
+		
+		// Apply rating filter
+		if (filterType === 'positive') {
+			filteredItems = filteredItems.filter(item => item.data?.rating > 0);
+		} else if (filterType === 'negative') {
+			filteredItems = filteredItems.filter(item => item.data?.rating < 0);
+		}
+		
+		// Apply search query if present
+		if (query.trim()) {
+			const lowerQuery = query.toLowerCase();
+			filteredItems = filteredItems.filter(item => {
+				// Search in chat title
+				if (item.snapshot?.chat?.title && 
+					item.snapshot.chat.title.toLowerCase().includes(lowerQuery)) {
+					return true;
+				}
+				
+				// Search in messages
+				const messages = item.snapshot?.chat?.chat?.messages;
+				if (Array.isArray(messages)) {
+					return messages.some(message => 
+						message.content && message.content.toLowerCase().includes(lowerQuery)
+					);
+				}
+				
+				return false;
+			});
+		}
+		
+		parsedFeedbacksData = filteredItems;
+	};
+	
+	const formatConversation = (messages) => {
+		if (!Array.isArray(messages)) {
+			return '<p class="text-gray-500 dark:text-gray-400 text-sm">No conversation data available</p>';
+		}
+		
+		return messages.map(message => {
+			const isUser = message.role === 'user';
+			const className = isUser 
+				? 'bg-gray-50 dark:bg-gray-800 p-3 rounded-lg mb-2'
+				: 'bg-gray-100 dark:bg-gray-700 p-3 rounded-lg mb-2';
+			
+			// Check for annotation/feedback
+			const hasFeedback = message.annotation || message.feedbackId;
+			const feedbackHighlight = hasFeedback ? 'border-2 border-red-500 dark:border-red-400' : '';
+			
+			return `
+				<div class="${className} ${feedbackHighlight}">
+					<div class="font-medium text-gray-700 dark:text-gray-300">${isUser ? 'User' : 'Assistant'}</div>
+					<div class="text-sm mt-1 text-gray-600 dark:text-gray-300">${message.content}</div>
+					${hasFeedback ? '<div class="text-red-500 dark:text-red-400 text-xs font-medium mt-1">[This message received feedback]</div>' : ''}
+				</div>
+			`;
+		}).join('');
+	};
+
+	// Handle refreshing feedbacks for analysis
+	const refreshFeedbacksAnalysis = async () => {
+		toast.info($i18n.t('Refreshing feedback analysis...'));
+		
+		try {
+			const refreshedFeedbacks = await exportAllFeedbacks(localStorage.token);
+			if (refreshedFeedbacks) {
+				processFeedbackData(refreshedFeedbacks);
+				toast.success($i18n.t('Feedback analysis refreshed successfully!'));
+			}
+		} catch (err) {
+			toast.error(err);
+		}
+	};
 </script>
 
 <div class="mt-0.5 mb-2 gap-1 flex flex-row justify-between">
@@ -115,11 +253,12 @@
 		<span class="text-lg font-medium text-gray-500 dark:text-gray-300">{feedbacks.length}</span>
 	</div>
 
-	{#if feedbacks.length > 0}
-		<div>
+	<div class="flex gap-1">
+		{#if feedbacks.length > 0}
+			<!-- Export Button -->
 			<Tooltip content={$i18n.t('Export')}>
 				<button
-					class=" p-2 rounded-xl hover:bg-gray-100 dark:bg-gray-900 dark:hover:bg-gray-850 transition font-medium text-sm flex items-center space-x-1"
+					class="p-2 rounded-xl hover:bg-gray-100 dark:bg-gray-900 dark:hover:bg-gray-850 transition font-medium text-sm flex items-center space-x-1"
 					on:click={() => {
 						exportHandler();
 					}}
@@ -127,8 +266,18 @@
 					<ArrowDownTray className="size-3" />
 				</button>
 			</Tooltip>
-		</div>
-	{/if}
+
+			<!-- Analysis Button -->
+			<Tooltip content={$i18n.t('Analyze Feedback')}>
+				<button
+					class="p-2 rounded-xl hover:bg-gray-100 dark:bg-gray-900 dark:hover:bg-gray-850 transition font-medium text-sm flex items-center space-x-1"
+					on:click={toggleFeedbackAnalysis}
+				>
+					<ChartBarSquare className="size-3" />
+				</button>
+			</Tooltip>
+		{/if}
+	</div>
 </div>
 
 <div
@@ -193,7 +342,6 @@
 										<Tooltip content={feedback.data.sibling_model_ids.join(', ')}>
 											<div class=" text-[0.65rem] text-gray-600 dark:text-gray-400 line-clamp-1">
 												{#if feedback.data.sibling_model_ids.length > 2}
-													<!-- {$i18n.t('and {{COUNT}} more')} -->
 													{feedback.data.sibling_model_ids.slice(0, 2).join(', ')}, {$i18n.t(
 														'and {{COUNT}} more',
 														{ COUNT: feedback.data.sibling_model_ids.length - 2 }
@@ -282,4 +430,130 @@
 
 {#if feedbacks.length > 10}
 	<Pagination bind:page count={feedbacks.length} perPage={10} />
+{/if}
+
+<!-- Feedback Analysis Section -->
+{#if showFeedbackAnalysis}
+<div class="mt-8 border-t border-gray-100 dark:border-gray-800 pt-4">
+	<div class="flex justify-between items-center mb-4">
+		<h2 class="text-lg font-medium text-gray-900 dark:text-white">{$i18n.t('Feedback Analysis')}</h2>
+		<div class="flex gap-2">
+			<button
+				class="p-2 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-gray-850 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition text-sm"
+				on:click={refreshFeedbacksAnalysis}
+			>
+				{$i18n.t('Refresh Analysis')}
+			</button>
+			<button
+				class="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-850 text-gray-600 dark:text-gray-300 transition"
+				on:click={toggleFeedbackAnalysis}
+			>
+				<XMark className="size-4" />
+			</button>
+		</div>
+	</div>
+
+	<div class="bg-gray-50 dark:bg-gray-850 p-4 rounded-lg mb-4">
+		<h3 class="text-base font-medium text-gray-800 dark:text-gray-200 mb-2">{$i18n.t('Summary')}</h3>
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+			<div class="bg-white dark:bg-gray-900 p-3 rounded-lg">
+				<div class="text-sm text-gray-500 dark:text-gray-400">{$i18n.t('Total Feedback')}</div>
+				<div class="text-xl font-bold text-gray-900 dark:text-white">{totalItems}</div>
+			</div>
+			<div class="bg-white dark:bg-gray-900 p-3 rounded-lg">
+				<div class="text-sm text-gray-500 dark:text-gray-400">{$i18n.t('Positive Ratings')}</div>
+				<div class="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+					{positiveCount} ({totalItems ? Math.round((positiveCount / totalItems) * 100) : 0}%)
+				</div>
+			</div>
+			<div class="bg-white dark:bg-gray-900 p-3 rounded-lg">
+				<div class="text-sm text-gray-500 dark:text-gray-400">{$i18n.t('Negative Ratings')}</div>
+				<div class="text-xl font-bold text-red-600 dark:text-red-400">
+					{negativeCount} ({totalItems ? Math.round((negativeCount / totalItems) * 100) : 0}%)
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="flex flex-col sm:flex-row gap-2 mb-4">
+		<input 
+			type="text" 
+			placeholder={$i18n.t('Search in conversations...')}
+			class="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+			bind:value={searchQuery}
+			on:input={(e) => filterFeedbackItems(activeFilter, e.target.value)}
+		/>
+		
+		<div class="flex gap-1">
+			<button 
+				class={`px-3 py-2 text-sm rounded-lg transition ${activeFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
+				on:click={() => filterFeedbackItems('all', searchQuery)}
+			>
+				{$i18n.t('All')}
+			</button>
+			<button 
+				class={`px-3 py-2 text-sm rounded-lg transition ${activeFilter === 'positive' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
+				on:click={() => filterFeedbackItems('positive', searchQuery)}
+			>
+				{$i18n.t('Positive')}
+			</button>
+			<button 
+				class={`px-3 py-2 text-sm rounded-lg transition ${activeFilter === 'negative' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
+				on:click={() => filterFeedbackItems('negative', searchQuery)}
+			>
+				{$i18n.t('Negative')}
+			</button>
+		</div>
+	</div>
+
+	{#if parsedFeedbacksData.length === 0}
+		<div class="text-center py-8 text-gray-500 dark:text-gray-400">
+			{$i18n.t('No matching feedback items found')}
+		</div>
+	{:else}
+		<div class="space-y-4 mb-4">
+			{#each parsedFeedbacksData as item (item.id)}
+				<div class={`bg-white dark:bg-gray-900 p-4 rounded-lg border-l-4 ${item.data.rating > 0 ? 'border-emerald-500' : item.data.rating < 0 ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}>
+					<h3 class="text-base font-medium text-gray-800 dark:text-gray-200 mb-2">{item.snapshot?.chat?.title || $i18n.t('Untitled Chat')}</h3>
+					
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+						<div>
+							<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">{$i18n.t('Browser ID')}: <span class="font-medium text-gray-700 dark:text-gray-300">{item.browser_id || 'N/A'}</span></p>
+							<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">{$i18n.t('Timestamp')}: <span class="font-medium text-gray-700 dark:text-gray-300">{dayjs((item.created_at || item.updated_at) * 1000).format('YYYY-MM-DD HH:mm:ss')}</span></p>
+							<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+								{$i18n.t('Rating')}: 
+								<span class={`font-medium ${item.data.rating > 0 ? 'text-emerald-600 dark:text-emerald-400' : item.data.rating < 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'}`}>
+									{item.data.rating > 0 ? $i18n.t('Positive') : item.data.rating < 0 ? $i18n.t('Negative') : $i18n.t('Neutral')}
+									{item.data.details?.rating !== undefined ? ` (${item.data.details.rating}/10)` : ''}
+								</span>
+							</p>
+						</div>
+						<div>
+							<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">{$i18n.t('Reason')}: <span class="font-medium text-gray-700 dark:text-gray-300">{item.data.reason || $i18n.t('Not specified')}</span></p>
+							<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">{$i18n.t('Comment')}: <span class="font-medium text-gray-700 dark:text-gray-300">{item.data.comment || $i18n.t('No comment provided')}</span></p>
+							{#if item.data.tags && item.data.tags.length > 0}
+								<div class="flex flex-wrap gap-1 mt-1">
+									{#each item.data.tags as tag}
+										<span class="px-2 py-1 text-xs rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">{tag}</span>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					</div>
+					
+					<div class="mt-3">
+						<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{$i18n.t('Conversation')}:</h4>
+						<div class="max-h-96 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+							{#if item.snapshot?.chat?.chat?.messages}
+								{@html formatConversation(item.snapshot.chat.chat.messages)}
+							{:else}
+								<p class="text-sm text-gray-500 dark:text-gray-400">{$i18n.t('No conversation data available')}</p>
+							{/if}
+						</div>
+					</div>
+				</div>
+			{/each}
+		</div>
+	{/if}
+</div>
 {/if}
