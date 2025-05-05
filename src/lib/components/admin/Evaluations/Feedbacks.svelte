@@ -54,15 +54,17 @@
 		browser_id?: string;
 		snapshot?: {
 			chat: {
-				title: string;
-				chat: {
-					messages: Array<{
-						role: string;
-						content: string;
-						annotation?: string;
+				id?: string;
+				title?: string;
+				chat?: {
+					messages?: Array<{
+						id?: string;
+						role?: string;
+						content?: string;
+						annotation?: any;
 						feedbackId?: string;
 						error?: {
-							content: string;
+							content?: string;
 						};
 					}>;
 				};
@@ -153,13 +155,20 @@
 		console.log('Feedback item structure:', {
 			id: item.id,
 			hasSnapshot: !!item.snapshot,
-			title: item.snapshot?.chat?.title,
-			messages: !!item.snapshot?.chat?.chat?.messages,
-			messageCount: item.snapshot?.chat?.chat?.messages?.length || 0
+			chatTitle: item.snapshot?.chat?.title,
+			hasMessages: !!item.snapshot?.chat?.chat?.messages,
+			messageCount: item.snapshot?.chat?.chat?.messages?.length || 0,
+			messagesArray: Array.isArray(item.snapshot?.chat?.chat?.messages),
+			history: !!item.snapshot?.chat?.chat?.history
 		});
 		
-		if (item.snapshot?.chat?.chat?.messages?.length > 0) {
-			console.log('First message structure:', item.snapshot.chat.chat.messages[0]);
+		if (item.snapshot?.chat?.chat?.messages && item.snapshot.chat.chat.messages.length > 0) {
+			console.log('First message:', item.snapshot.chat.chat.messages[0]);
+		}
+		
+		// Also check if messages might be in a different location
+		if (item.snapshot?.chat?.chat?.history?.messages) {
+			console.log('Found messages in history:', Object.values(item.snapshot.chat.chat.history.messages)[0]);
 		}
 	};
 
@@ -168,6 +177,22 @@
 		if (showFeedbackAnalysis && parsedFeedbacksData.length === 0) {
 			processFeedbackData([...feedbacks]);
 		}
+	};
+	
+	// Helper function to extract messages from different possible structures
+	const extractMessages = (item) => {
+		// Direct messages array (most common)
+		if (item.snapshot?.chat?.chat?.messages && Array.isArray(item.snapshot.chat.chat.messages)) {
+			return item.snapshot.chat.chat.messages;
+		}
+		
+		// Messages in history object (as shown in your example)
+		if (item.snapshot?.chat?.chat?.history?.messages && typeof item.snapshot.chat.chat.history.messages === 'object') {
+			// Convert object of messages to array
+			return Object.values(item.snapshot.chat.chat.history.messages);
+		}
+		
+		return null;
 	};
 
 	const processFeedbackData = (feedbackData) => {
@@ -215,9 +240,9 @@
 					return true;
 				}
 				
-				// Search in messages
-				const messages = item.snapshot?.chat?.chat?.messages;
-				if (Array.isArray(messages)) {
+				// Search in messages from different possible structures
+				const messages = extractMessages(item);
+				if (messages) {
 					return messages.some(message => 
 						message.content && message.content.toLowerCase().includes(lowerQuery)
 					);
@@ -234,8 +259,10 @@
 		console.log(`Filter: ${filterType}, Query: "${query}", Results: ${filteredItems.length}/${originalFeedbacksData.length}`);
 	};
 	
-	const formatConversation = (messages) => {
-		if (!Array.isArray(messages)) {
+	const formatConversation = (item) => {
+		const messages = extractMessages(item);
+		
+		if (!messages || !Array.isArray(messages)) {
 			return '<p class="text-gray-500 dark:text-gray-400 text-sm">No conversation data available</p>';
 		}
 		
@@ -553,8 +580,9 @@
 		<div class="space-y-4 mb-4">
 			{#each parsedFeedbacksData as item (item.id)}
 				<div class={`bg-white dark:bg-gray-900 p-4 rounded-lg border-l-4 ${item.data.rating > 0 ? 'border-emerald-500' : item.data.rating < 0 ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}>
-					<div>
-					<h3 class="text-base font-medium text-gray-800 dark:text-gray-200 mb-2">{item.snapshot?.chat?.title || item.meta?.model_id || $i18n.t('Untitled Chat')}</h3>
+					<h3 class="text-base font-medium text-gray-800 dark:text-gray-200 mb-2">
+						{item.snapshot?.chat?.title || $i18n.t('Untitled Chat')}
+					</h3>
 					
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
 						<div>
@@ -584,14 +612,9 @@
 					<div class="mt-3">
 						<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{$i18n.t('Conversation')}:</h4>
 						<div class="max-h-96 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
-							{#if item.snapshot?.chat?.chat?.messages}
-								{@html formatConversation(item.snapshot.chat.chat.messages)}
-							{:else}
-								<p class="text-sm text-gray-500 dark:text-gray-400">{$i18n.t('No conversation data available')}</p>
-							{/if}
+							{@html formatConversation(item)}
 						</div>
 					</div>
-				</div>
 				</div>
 			{/each}
 		</div>
